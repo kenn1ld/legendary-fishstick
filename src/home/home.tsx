@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
 
 interface User {
   _id: string;
@@ -34,6 +36,24 @@ function Home({user}: HomeProps) {
         <h2>Please log in to view your information</h2>
       )}
       {/* Rest of the existing JSX */}
+
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6} md={4}>
+          <Paper elevation={1}>
+            {/* Add content here */}
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <Paper elevation={1}>
+            
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <Paper elevation={1}>
+            {/* Add content here */}
+          </Paper>
+        </Grid>
+      </Grid>
     </div>
   );
 }
