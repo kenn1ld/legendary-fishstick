@@ -31,7 +31,6 @@ const LoginPage = ({setUser}:LoginPageProps) => {
         try {
           const userData = await getUser(storedToken);
           setUser(userData);
-          alert('User information retrieved successfully');
   
           // Redirect to a protected route or handle successful login
           navigate('/');

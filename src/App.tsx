@@ -1,14 +1,15 @@
-import React, {useState, useEffect} from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./home/home";
 import SignupPage from "./signup/signup";
 import LoginPage from "./login/login";
 import GlobalHeader from "./header/globalheader";
 import { User } from "./interface/user";
 import useAuth from "./hooks/useAuth";
-function App() {
 
+function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { getUser } = useAuth();
 
   useEffect(() => {
@@ -21,17 +22,33 @@ function App() {
           setUser(userData);
         } catch (err) {
           console.error("Error getting user information:", err);
+          // Clear the invalid token from localStorage
+          localStorage.removeItem("token");
         }
+        setIsLoading(false);
       })();
+    } else {
+      setIsLoading(false);
     }
-  }, [getUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLogout = () => {
+    // Clear the token from localStorage and update the user state
+    localStorage.removeItem("token");
+    setUser(null);
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Router>
       <div className="App">
-        <GlobalHeader title="User Management App" />
+        <GlobalHeader title="User Management App" onLogout={handleLogout} />
         <Routes>
-          <Route path="/" element={<Home user={user} />} />
+          <Route path="/" element={user ? <Home user={user} /> : <Navigate to="/login" />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage setUser={setUser} />} />
         </Routes>
