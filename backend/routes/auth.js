@@ -67,7 +67,7 @@ router.post("/login", async (req, res) => {
       { _id: user._id },
       "BT7b4mwRtPwuc5SHjxLN%M*$vSaSHCrHWgLor^222i*KDa*oBHYzBa@JmmP9^j*E4URS57gNfHiotVReJ$vAiJQ6sjC*xJ!P7CTDzucTbdSTNk*mUk4hxv@hbio7xVYt",
       {
-        expiresIn: "1h",
+        expiresIn: "12h",
       }
     );
 

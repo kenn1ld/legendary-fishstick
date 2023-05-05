@@ -43,7 +43,7 @@ const useAuth = () => {
     try {
       const response = await axios.get("/api/auth/me", {
         headers: {
-          Authorization: `Bearer ${token}`, // Add "Bearer" before the token
+          Authorization: `Bearer ${token}`, 
         },
       });
       return response.data;

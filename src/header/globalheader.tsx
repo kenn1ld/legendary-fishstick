@@ -1,15 +1,30 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 
-interface GlobalHeaderProps {
-  title: string;
-  onLogout?: () => void;
+interface User {
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
 }
 
-const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, onLogout }) => {
+interface GlobalHeaderProps {
+  title: string;
+  user: User | null;
+  onLogout?: () => void;
+  onLogin?: () => void;
+}
+
+const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, user, onLogout, onLogin }) => {
   const handleLogout = () => {
     if (onLogout) {
       onLogout();
+    }
+  };
+
+  const handleLogin = () => {
+    if (onLogin) {
+      onLogin();
     }
   };
 
@@ -19,9 +34,18 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, onLogout }) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           {title}
         </Typography>
-        {onLogout && (
+        {user && (
+          <Typography variant="subtitle1" component="span" sx={{ marginRight: 2 }}>
+            {user.username}
+          </Typography>
+        )}
+        {user ? (
           <Button color="inherit" onClick={handleLogout}>
             Logout
+          </Button>
+        ) : (
+          <Button color="inherit" onClick={handleLogin}>
+            Login
           </Button>
         )}
       </Toolbar>

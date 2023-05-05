@@ -46,7 +46,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <GlobalHeader title="User Management App" onLogout={handleLogout} />
+        <GlobalHeader title="Your App Title" user={user} onLogout={handleLogout} />
         <Routes>
           <Route path="/" element={user ? <Home user={user} /> : <Navigate to="/login" />} />
           <Route path="/signup" element={<SignupPage />} />
