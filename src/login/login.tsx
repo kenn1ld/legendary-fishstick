@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect, Dispatch} from 'react';
+import React, { useState, FormEvent, Dispatch } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import { User } from '../interface/user';
@@ -10,58 +10,41 @@ import {
   Box,
   Grid,
 } from '@mui/material';
+
 interface LoginPageProps {
   setUser: Dispatch<React.SetStateAction<User | null>>;
 }
-const LoginPage = ({setUser}:LoginPageProps) => {
+
+const LoginPage = ({ setUser }: LoginPageProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  
-  
 
   const navigate = useNavigate();
   const { loginUser, getUser } = useAuth();
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-  
-    if (storedToken) {
-      (async () => {
-        try {
-          const userData = await getUser(storedToken);
-          setUser(userData);
-  
-          // Redirect to a protected route or handle successful login
-          navigate('/');
-        } catch (err) {
-          setError('Error getting user information');
-        }
-      })();
-    }
-  }, [getUser, navigate, setUser]);
-  
-  
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+
     try {
-      const authToken = await loginUser(email, password);
+      const token = await loginUser(email, password);
+
+      // Clear any previous errors
       setError('');
-  
+
       // Store token in localStorage and update state
-      localStorage.setItem('token', authToken);
-  
+      localStorage.setItem('token', token);
+
       // Get user information and update state
-      const userData = await getUser(authToken);
+      const userData = await getUser(token);
       setUser(userData);
-      
+
+      // Redirect to the home page after successful login
+      navigate('/');
     } catch (err) {
       setError('Error logging in user');
     }
   };
-  
 
   const goToSignup = () => {
     navigate('/signup');
@@ -117,13 +100,9 @@ const LoginPage = ({setUser}:LoginPageProps) => {
             Go to Signup
           </Button>
         </Box>
-
-        
-        
       </Box>
     </Container>
   );
 };
-
 
 export default LoginPage;

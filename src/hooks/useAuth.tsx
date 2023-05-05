@@ -18,19 +18,26 @@ const useAuth = () => {
     }
   };
 
-  // Login user
-  const loginUser = async (email: string, password: string) => {
-    try {
-      const response = await axios.post("/api/auth/login", {
-        email,
-        password,
-      });
-      return response.data.token;
-    } catch (error) {
-      console.error("Error logging in user:", error);
-      throw error;
-    }
-  };
+ // Login user
+ const loginUser = async (email: string, password: string) => {
+   try {
+     const response = await axios.post("/api/auth/login", {
+       email,
+       password,
+     });
+     console.log('response:', response); // Add this line
+ 
+     if (response.data && response.data.token) {
+       return response.data.token;
+     } else {
+       throw new Error('Token not found in response');
+     }
+   } catch (error) {
+     console.error("Error logging in user:", error);
+     throw error;
+   }
+ };
+ 
 
   const getUser = async (token: string) => {
     try {

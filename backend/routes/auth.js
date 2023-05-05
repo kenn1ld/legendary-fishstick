@@ -16,7 +16,10 @@ const authMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      "BT7b4mwRtPwuc5SHjxLN%M*$vSaSHCrHWgLor^222i*KDa*oBHYzBa@JmmP9^j*E4URS57gNfHiotVReJ$vAiJQ6sjC*xJ!P7CTDzucTbdSTNk*mUk4hxv@hbio7xVYt"
+    );
     req.user = decoded;
     next();
   } catch (error) {
@@ -60,9 +63,13 @@ router.post("/login", async (req, res) => {
       return res.status(401).send({ message: "Invalid password" });
     }
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { _id: user._id },
+      "BT7b4mwRtPwuc5SHjxLN%M*$vSaSHCrHWgLor^222i*KDa*oBHYzBa@JmmP9^j*E4URS57gNfHiotVReJ$vAiJQ6sjC*xJ!P7CTDzucTbdSTNk*mUk4hxv@hbio7xVYt",
+      {
+        expiresIn: "1h",
+      }
+    );
 
     res.status(200).send({ token });
   } catch (error) {
