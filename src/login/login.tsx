@@ -1,24 +1,57 @@
-import React, { useState, FormEvent, Dispatch } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
-import { User } from '../interface/user';
+import React, { useState, FormEvent, Dispatch } from "react";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+import { User } from "../interface/user";
 import {
   Container,
-  TextField,
-  Button,
+  OutlinedInput,
   Typography,
   Box,
   Grid,
-} from '@mui/material';
-
+  useTheme,
+  InputLabel,
+  InputAdornment,
+  IconButton,
+  FormControl,
+} from "@mui/material";
+import { motion } from "framer-motion";
+import MailIcon from "@mui/icons-material/Mail";
+import LockIcon from "@mui/icons-material/Lock";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Logo from "../components/Logo"
+import AnimatedButton from "../components/AnimatedButton";
 interface LoginPageProps {
   setUser: Dispatch<React.SetStateAction<User | null>>;
 }
+
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: {
+      duration: 1,
+    },
+  },
+};
+
+const scaleUp = {
+  initial: { scale: 0 },
+  animate: {
+    scale: 1,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
+
+
 
 const LoginPage = ({ setUser }: LoginPageProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const theme = useTheme();
 
   const navigate = useNavigate();
   const { loginUser, getUser } = useAuth();
@@ -50,36 +83,105 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
     navigate('/signup');
   };
 
+   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const handleClickShowPassword = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 8 }}>
-        <Typography variant="h4" gutterBottom>
-          Login Page
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fadeIn}
+        style={{ marginTop: "2rem" }}
+      >
+        {/* Display a logo/icon */}
+      
+      <Logo/>
+
+        <Typography variant="h4" gutterBottom color="textPrimary">
+          Login
         </Typography>
-        <form onSubmit={handleSubmit}>
+
+        <motion.form
+          onSubmit={handleSubmit}
+          initial="initial"
+          animate="animate"
+          variants={scaleUp}
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            padding: "2rem",
+            borderRadius: "10px",
+          }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <FormControl fullWidth variant="outlined">
+                <InputLabel
+                  htmlFor="emailInput"
+                  style={{ color: theme.palette.text.primary }}
+                >
+                  Email
+                </InputLabel>
+                <OutlinedInput
+                  id="emailInput"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <MailIcon color="action" />
+                    </InputAdornment>
+                  }
+                  label="Email"
+                  inputProps={{
+                    style: { color: theme.palette.text.primary },
+                  }}
+                  required
+                />
+              </FormControl>
             </Grid>
 
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Password"
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <FormControl fullWidth variant="outlined">
+                <InputLabel
+                  htmlFor="passwordInput"
+                  style={{ color: theme.palette.text.primary }}
+                >
+                  Password
+                </InputLabel>
+                <OutlinedInput
+                  id="passwordInput"
+                  type={isPasswordVisible ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <LockIcon color="action" />
+                    </InputAdornment>
+                  }
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        edge="end"
+                        onClick={handleClickShowPassword}
+                      >
+                        {isPasswordVisible ? (
+                          <Visibility color="action" />
+                        ) : (
+                          <VisibilityOff color="action" />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  label="Password"
+                  inputProps={{
+                    style: { color: theme.palette.text.primary },
+                  }}
+                  required
+                />
+              </FormControl>
             </Grid>
 
             {error && (
@@ -89,18 +191,25 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
             )}
 
             <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit">
-                Login
-              </Button>
-            </Grid>
+            <AnimatedButton variant="contained" type="submit" fullWidth >
+              Login
+            </AnimatedButton>
           </Grid>
-        </form>
-        <Box sx={{ mt: 2 }}>
-          <Button variant="outlined" color="secondary" onClick={goToSignup}>
-            Go to Signup
-          </Button>
+        </Grid>
+      </motion.form>
+        <Box sx={{ mt: 2, textAlign: "center" }}>
+          <Typography variant="body2" color="textSecondary">
+            Don't have an account?{" "}
+            
+            <AnimatedButton
+              onClick={goToSignup}
+              style={{ textTransform: "none", fontWeight: "bold" }}
+            >
+              Sign up
+            </AnimatedButton>
+          </Typography>
         </Box>
-      </Box>
+      </motion.div>
     </Container>
   );
 };
