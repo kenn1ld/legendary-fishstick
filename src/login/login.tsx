@@ -191,9 +191,9 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
             )}
 
             <Grid item xs={12}>
-            <AnimatedButton variant="contained" type="submit" fullWidth >
+               <AnimatedButton type="submit" fullWidth>
               Login
-            </AnimatedButton>
+          </AnimatedButton>
           </Grid>
         </Grid>
       </motion.form>

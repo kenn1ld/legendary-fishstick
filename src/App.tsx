@@ -7,7 +7,7 @@ import GlobalHeader from "./header/globalheader";
 import { User } from "./interface/user";
 import useAuth from "./hooks/useAuth";
 import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
-import { lightGreen } from '@mui/material/colors';
+
 
 
 const theme = createTheme({
@@ -17,25 +17,7 @@ const theme = createTheme({
       main: "#32cd32",
     },
   },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          color: 'white',
-          backgroundColor: "#32cd32",
-          '&:hover': {
-            backgroundColor: lightGreen[900],
-          },
-        },
-        contained: {
-          backgroundColor: "#32cd32",
-          '&:hover': {
-            backgroundColor: lightGreen[900],
-          },
-        },
-      },
-    },
-  },
+  
 });
 
 function App() {

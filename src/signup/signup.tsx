@@ -234,7 +234,7 @@ const SignupPage = () => {
             )}
 
             <Grid item xs={12}>
-              <AnimatedButton variant="contained" type="submit" fullWidth >
+              <AnimatedButton type="submit" fullWidth >
                 Signup
               </AnimatedButton>
             </Grid>
