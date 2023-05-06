@@ -6,6 +6,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Link as RouterLink } from 'react-router-dom';
+import CodeIcon from '@mui/icons-material/Code';
 
 interface User {
   _id: string;
@@ -29,7 +30,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, user, onLogout }) =>
   };
 
   return (
-    <AppBar position="static" elevation={1} color="default">
+    <AppBar position="static" elevation={1} color="default" sx={{ marginBottom: '1rem' }}>
       <Toolbar>
         <Box display="flex" alignItems="center">
           {/* Add your logo as an SVG or an image */}
@@ -61,6 +62,9 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, user, onLogout }) =>
           <IconButton sx={{ color: "limegreen" }} component={RouterLink} to="/">
             <HomeIcon />
           </IconButton>
+          <IconButton sx={{ color: "limegreen" }} component={RouterLink} to="/ApiPlayground">
+                <CodeIcon />
+                </IconButton>
           {/* Login and Logout icons */}
           {user ? (
             <>
@@ -78,7 +82,11 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, user, onLogout }) =>
               {/* Signup icon */}
               <IconButton sx={{ color: "limegreen" }} component={RouterLink} to="/signup">
                 <PersonAddIcon />
-              </IconButton>
+                </IconButton>
+                {/* API Playground icon */}
+              <IconButton sx={{ color: "limegreen" }} component={RouterLink} to="/ApiPlayground">
+                <CodeIcon />
+                </IconButton>
             </>
           )}
         </Box>
