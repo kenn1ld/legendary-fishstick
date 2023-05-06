@@ -6,6 +6,13 @@ import LoginPage from "./login/login";
 import GlobalHeader from "./header/globalheader";
 import { User } from "./interface/user";
 import useAuth from "./hooks/useAuth";
+import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
+
+const theme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -44,16 +51,26 @@ function App() {
   }
 
   return (
-    <Router>
-      <div className="App">
-        <GlobalHeader title="Your App Title" user={user} onLogout={handleLogout} />
-        <Routes>
-          <Route path="/" element={user ? <Home user={user} /> : <Navigate to="/login" />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/login" element={<LoginPage setUser={setUser} />} />
-        </Routes>
-      </div>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <div className="App">
+          <GlobalHeader
+            title="Your App Title"
+            user={user}
+            onLogout={handleLogout}
+          />
+          <Routes>
+            <Route
+              path="/"
+              element={user ? <Home user={user} /> : <Navigate replace to="/login" />}
+            />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/login" element={<LoginPage setUser={setUser} />} />
+          </Routes>
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 
