@@ -9,7 +9,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = (props) => {
     return (
         <Button
             {...buttonProps}
-            className={`animated-button ${className}`}
+            className={`animated-button conic ${className}`}
             sx={{
                 position: 'relative',
                 overflow: 'hidden',

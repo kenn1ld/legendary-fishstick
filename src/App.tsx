@@ -7,7 +7,7 @@ import GlobalHeader from "./header/globalheader";
 import { User } from "./interface/user";
 import useAuth from "./hooks/useAuth";
 import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
-
+import CryptoCurrency from "./components/CryptoCurrency";
 
 
 const theme = createTheme({
@@ -60,6 +60,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
+        <CryptoCurrency />
         <div className="App">
           <GlobalHeader
             title="Kenneth's Portfolio"
