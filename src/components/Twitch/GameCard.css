@@ -1,0 +1,65 @@
+.game-card {
+  margin: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  /* Set the default border color to be more subtle */
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.game-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.game-card-media {
+  transition: transform 0.3s ease;
+  /* Add a linear gradient overlay */
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+}
+
+.game-card:hover .game-card-media {
+  transform: scale(1.1);
+}
+
+.game-card-text {
+  padding: 8px 0;
+  font-weight: bold;
+  /* Add a text outline effect */
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+  /* Apply a gradient effect to the text */
+  background-image: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee, #ffcce8);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+/* Add the active class styles */
+.game-card.active {
+  /* Change the border color to stand out */
+  border-color: #f50057;
+  /* Apply a more pronounced box-shadow */
+  box-shadow: 0 0 0 5px rgba(245, 0, 87, 0.2), 0 8px 16px rgba(0, 0, 0, 0.2);
+  /* Add animation to the border */
+  animation: anim-border 10s infinite linear;
+}
+
+/* Create a custom animation for the active border */
+@keyframes anim-border {
+  0% {
+    border-color: #f50057;
+  }
+  20% {
+    border-color: #fad0c4;
+  }
+  40% {
+    border-color: #fbc2eb;
+  }
+  60% {
+    border-color: #a6c1ee;
+  }
+  80% {
+    border-color: #ffcce8;
+  }
+  100% {
+    border-color: #ff9a9e;
+  }
+}

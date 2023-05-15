@@ -98,7 +98,7 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
       >
         {/* Display a logo/icon */}
       
-      <Logo/>
+        <Logo />
 
         <Typography variant="h4" gutterBottom color="textPrimary">
           Login

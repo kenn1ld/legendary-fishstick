@@ -1,0 +1,26 @@
+.game-grid {
+  margin-bottom: 25px;
+}
+
+.game-card {
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.game-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.streamer-name {
+  cursor: pointer;
+  color: #9146ff;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.streamer-name:hover {
+  text-decoration: underline;
+  color: #a774ff;
+  text-transform: uppercase;
+}

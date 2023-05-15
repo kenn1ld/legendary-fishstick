@@ -10,7 +10,6 @@ import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
 import CryptoCurrency from "./components/CryptoCurrency";
 import ApiPage from "./apipage/apiPage";
 
-
 const theme = createTheme({
   palette: {
     mode: "dark",
@@ -18,7 +17,6 @@ const theme = createTheme({
       main: "#32cd32",
     },
   },
-  
 });
 
 function App() {
@@ -32,12 +30,11 @@ function App() {
     if (storedToken) {
       (async () => {
         try {
-          const userData = await getUser(storedToken);
-          setUser(userData);
+          setUser(await getUser(storedToken));
         } catch (err) {
           console.error("Error getting user information:", err);
           // Clear the invalid token from localStorage
-          localStorage.removeItem("token");
+          localStorage.clear();
         }
         setIsLoading(false);
       })();
@@ -49,7 +46,7 @@ function App() {
 
   const handleLogout = () => {
     // Clear the token from localStorage and update the user state
-    localStorage.removeItem("token");
+    localStorage.clear();
     setUser(null);
   };
 
