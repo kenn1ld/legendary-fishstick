@@ -3,6 +3,7 @@ import CryptoCurrency from "../components/CryptoCurrency";
 import TwitchApi from "../components/Twitch/Twitch";
 import { Container, Typography } from "@mui/material";
 import { styled } from "@mui/system";
+import VirusTotalCheck from "components/VirusTotal/VirusTotalCheck";
 
 const SectionWrapper = styled("div")({
   marginBottom: "2rem",
@@ -26,6 +27,10 @@ const ApiPage = () => {
       <SectionWrapper>
         <SectionTitle variant="h4">Twitch</SectionTitle>
         <TwitchApi />
+      </SectionWrapper>
+      <SectionWrapper>
+        <SectionTitle variant="h4">Virus Total</SectionTitle>
+        <VirusTotalCheck />
       </SectionWrapper>
     </Container>
   );

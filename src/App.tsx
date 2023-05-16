@@ -1,3 +1,4 @@
+// App.tsx
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./home/home";
@@ -7,7 +8,6 @@ import GlobalHeader from "./header/globalheader";
 import { User } from "./interface/user";
 import useAuth from "./hooks/useAuth";
 import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
-import CryptoCurrency from "./components/CryptoCurrency";
 import ApiPage from "./apipage/apiPage";
 
 const theme = createTheme({
@@ -33,7 +33,6 @@ function App() {
           setUser(await getUser(storedToken));
         } catch (err) {
           console.error("Error getting user information:", err);
-          // Clear the invalid token from localStorage
           localStorage.clear();
         }
         setIsLoading(false);
@@ -41,11 +40,9 @@ function App() {
     } else {
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getUser]);
 
   const handleLogout = () => {
-    // Clear the token from localStorage and update the user state
     localStorage.clear();
     setUser(null);
   };
@@ -58,7 +55,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <div className="App">
+        <div className="App" style={{ position: "relative", minHeight: "100vh" }}>
           <GlobalHeader
             title="Kenneth's Portfolio"
             user={user}

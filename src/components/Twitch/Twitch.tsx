@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Skeleton } from '@mui/lab';
 import {
   Grid,
@@ -99,6 +98,7 @@ const TwitchApi: React.FC = () => {
   return () => {
     isMounted = false; // Set the flag to false when the component is unmounted
   };
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, [selectedGame, currentPage]);
 
  const handleGameClick = async (gameId: string) => {

@@ -21,6 +21,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Logo from "../components/Logo"
 import AnimatedButton from "../components/AnimatedButton";
+import BackgroundParticles from "components/BackgroundParticles";
 interface LoginPageProps {
   setUser: Dispatch<React.SetStateAction<User | null>>;
 }
@@ -88,14 +89,26 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  return (
-    <Container maxWidth="sm">
-      <motion.div
-        initial="initial"
-        animate="animate"
-        variants={fadeIn}
-        style={{ marginTop: "2rem" }}
+ return (
+  <Container maxWidth="sm">
+    <motion.div
+      initial="initial"
+      animate="animate"
+      variants={fadeIn}
+      style={{ marginTop: "2rem", position: "relative" }}
+    >
+      {/* Add the BackgroundParticles component wrapped in the parent div */}
+      <div
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          zIndex: -1,
+        }}
       >
+        <BackgroundParticles />
+      </div>
+
         {/* Display a logo/icon */}
       
         <Logo />
