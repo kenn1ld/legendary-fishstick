@@ -1,19 +1,19 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  Divider,
-  Grid,
-  Button,
-} from '@mui/material';
-import { ApiResponse } from './VirusTotalTypes';
-import { green, red, orange } from '@mui/material/colors';
+
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import WarningIcon from '@mui/icons-material/Warning';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import WarningIcon from '@mui/icons-material/Warning';
+import { Box, Chip, Divider, Grid, Typography, Button } from '@mui/material';
+import { green, red, orange } from '@mui/material/colors';
+import { styled } from '@mui/system';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+
+import { ApiResponse } from './VirusTotalTypes';
+
+const ResultChip = styled(Chip)(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+}));
 
 interface ReportProps {
   report: ApiResponse;
@@ -23,38 +23,38 @@ const Report: React.FC<ReportProps> = ({ report }) => {
   const formattedWhois = formatWhois(report.data.attributes.whois);
 
   const exportToPDF = () => {
-  const input = document.getElementById("report");
-  if (!input) return;
+    const input = document.getElementById('report');
+    if (!input) return;
 
-  html2canvas(input).then((canvas) => {
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4"); // Set the PDF page format: Portrait, unit: mm, size: A4
-    const pageWidth = pdf.internal.pageSize.getWidth(); // get the width of the PDF page
-    const pageHeight = pdf.internal.pageSize.getHeight(); // get the height of the PDF page
-    const imgWidth = pageWidth - 20; // adjust the width based on margins
-    const imgHeight = (canvas.height * imgWidth) / canvas.width; // maintain the aspect ratio
+    void html2canvas(input).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4'); // Set the PDF page format: Portrait, unit: mm, size: A4
+      const pageWidth = pdf.internal.pageSize.getWidth(); // get the width of the PDF page
+      const pageHeight = pdf.internal.pageSize.getHeight(); // get the height of the PDF page
+      const imgWidth = pageWidth - 20; // adjust the width based on margins
+      const imgHeight = (canvas.height * imgWidth) / canvas.width; // maintain the aspect ratio
 
-    let heightLeft = imgHeight;
-    let position = 0;
+      let heightLeft = imgHeight;
+      let position = 0;
 
-    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight - 20;
-
-    // Add new pages if the content is too large
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
       heightLeft -= pageHeight - 20;
-    }
 
-    pdf.save("report.pdf");
-  });
-};
+      // Add new pages if the content is too large
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight - 20;
+      }
+
+      pdf.save('report.pdf');
+    });
+  };
 
   return (
-    <Grid container>
-      <Grid item xs={12} sm={6}>
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
         <Typography
           variant="h4"
           component="div"
@@ -63,14 +63,7 @@ const Report: React.FC<ReportProps> = ({ report }) => {
           Report for {report.data.id}
         </Typography>
       </Grid>
-      <Grid
-        container
-        item
-        xs={12}
-        sm={6}
-        justifyContent="flex-end"
-        alignItems="center"
-      >
+      <Grid item xs={12}>
         <Button
           onClick={exportToPDF}
           variant="contained"
@@ -83,101 +76,108 @@ const Report: React.FC<ReportProps> = ({ report }) => {
       <Grid
         item
         xs={12}
-        id="report"
         component={Box}
         sx={{
-          mt: 4,
-          boxShadow: 2,
-          borderRadius: 2,
           p: 3,
           bgcolor: 'background.paper',
+          borderRadius: 1,
+          boxShadow: 1,
         }}
       >
-        <Typography variant="h6" component="div" gutterBottom sx={{ mb: 2 }}>
-          <Box
-            component="span"
-            sx={{
-              borderBottom: '3px solid currentColor',
-              paddingBottom: '0.25rem',
-            }}
-          >
-            Category:
-          </Box>{' '}
-          {report.data.attributes.categories ? (
-            Object.entries(report.data.attributes.categories).map(
-              ([vendor, category]) => (
-                <Chip
-                  key={vendor}
-                  variant="outlined"
-                  size="small"
-                  label={`${vendor}: ${category}`}
-                  sx={{ mr: 1, mb: 1, fontStyle: 'italic' }}
-                />
-              ),
-            )
-          ) : (
-            'N/A'
-          )}
+        <Typography variant="h6" component="div" gutterBottom>
+          <strong>Category:</strong>
         </Typography>
-        <Divider />
-        <Typography
-          variant="body1"
-          component="div"
-          gutterBottom
-          sx={{ mt: 2, mb: 1 }}
-        >
-          <Box component="span" fontWeight="bold">
-            Registrar:
-          </Box>{' '}
+        {report.data.attributes.categories
+          ? Object.entries(report.data.attributes.categories).map(
+            ([vendor, category]) => (
+              <Chip
+                key={vendor}
+                variant="outlined"
+                size="small"
+                label={`${vendor}: ${category}`}
+                sx={{ mr: 1, mb: 1, fontStyle: 'italic' }}
+              />
+            )
+          )
+          : 'N/A'}
+        <Divider sx={{ my: 3 }} />
+
+        <Typography variant="subtitle1" gutterBottom>
+          <strong>Registrar:</strong>{' '}
           {report.data.attributes.registrar || 'N/A'}
         </Typography>
-        <Typography variant="body1">
-          <Box component="span" fontWeight="bold">
-            WHOIS:
-          </Box>{' '}
-          {formattedWhois ? (
-            formattedWhois.map((item, index) => (
-              <div key={index}>
-                <strong>{item.label}:</strong> {item.value}
-              </div>
-            ))
-          ) : (
-            'N/A'
-          )}
+        <Typography variant="subtitle1" gutterBottom>
+          <strong>WHOIS:</strong>
         </Typography>
-        <Typography
-          variant="h6"
-          component="div"
-          gutterBottom
-          sx={{ fontWeight: 'bold', mt: 2, mb: 2 }}
-        >
-          Last Analysis Results:
+        {formattedWhois
+          ? formattedWhois.map((item, index) => (
+            <Typography key={index} variant="body2">
+              <strong>{item.label}:</strong> {item.value}
+            </Typography>
+          ))
+          : 'N/A'}
+        <Divider sx={{ my: 3 }} />
+
+        <Typography variant="h6" component="div" gutterBottom>
+          <strong>Last Analysis Results:</strong>
         </Typography>
-        <Divider />
-        {report.data.attributes.last_analysis_results &&
-          Object.entries(report.data.attributes.last_analysis_results).map(
-            ([engine, details]) => (
-              <Box
-                key={engine}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  py: 1,
-                }}
-              >
-                <Box component="span">
-                  {engine} ({details.method})
-                </Box>
-                <Box
-                  component="span"
-                  sx={{ display: 'flex', alignItems: 'center' }}
-                >
-                  {getResultChip(details.result)}
-                </Box>
-              </Box>
-            ),
-          )}
+        <Grid container spacing={1}>
+          {report.data.attributes.last_analysis_results &&
+            Object.entries(report.data.attributes.last_analysis_results).map(
+              ([engine, details]) => (
+                <Grid item xs={12} sm={6} md={4} key={engine}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%', // Set the width to 100%
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: 'bold',
+                        paddingRight: '8px',
+                        overflowWrap: 'break-word', // Enable word wrapping
+                        wordWrap: 'break-word', // Enable word wrapping
+                        fontSize: { xs: '0.875rem', sm: 'inherit' }, // Use a smaller font size for xs screens
+                      }}
+                    >
+                      {engine} ({details.method})
+                    </Typography>
+                    <ResultChip
+                      icon={
+                        getResultChip(details.result) === 'clean' ? (
+                          <CheckCircleOutlineIcon />
+                        ) : getResultChip(details.result) === 'unrated' ? (
+                          <WarningIcon />
+                        ) : (
+                          <ErrorOutlineIcon />
+                        )
+                      }
+                      label={details.result}
+                      size="small"
+                      sx={{
+                        backgroundColor:
+                          getResultChip(details.result) === 'clean'
+                            ? green[300]
+                            : getResultChip(details.result) === 'unrated'
+                              ? orange[300]
+                              : red[300],
+                        color:
+                          getResultChip(details.result) === 'clean'
+                            ? green[700]
+                            : getResultChip(details.result) === 'unrated'
+                              ? orange[700]
+                              : red[700],
+                      }}
+                    />
+                  </Box>
+                </Grid>
+              )
+            )}
+        </Grid>
       </Grid>
     </Grid>
   );
@@ -198,39 +198,15 @@ const formatWhois = (whois: string | null | undefined) => {
   return formatted;
 };
 
-const getResultChip = (result: string | null | undefined): JSX.Element => {
+const getResultChip = (result: string | null | undefined): string => {
   if (!result || result.toLowerCase() === 'unrated') {
-    return (
-      <Chip
-        icon={<WarningIcon />}
-        label="Unrated"
-        size="small"
-        sx={{ backgroundColor: orange[100], color: orange[700] }}
-      />
-    );
+    return 'unrated';
   }
   const resultText = result.toLowerCase();
-  switch (resultText) {
-    case 'clean':
-    case 'undetected':
-      return (
-        <Chip
-          icon={<CheckCircleOutlineIcon />}
-          label={result}
-          size="small"
-          sx={{ backgroundColor: green[100], color: green[700] }}
-        />
-      );
-    default:
-      return (
-        <Chip
-          icon={<ErrorOutlineIcon />}
-          label={result}
-          size="small"
-          sx={{ backgroundColor: red[100], color: red[700] }}
-        />
-      );
+  if (resultText === 'clean' || resultText === 'undetected') {
+    return 'clean';
   }
+  return 'malicious';
 };
 
 export default Report;

@@ -18,7 +18,7 @@ interface CryptoData {
   image: string;
 }
 
-const saveDataToLocalStorage = (key: string, data: any) => {
+const saveDataToLocalStorage = (key: string, data: unknown) => {
   const currentTimestamp = new Date().toISOString();
   const dataToSave = { data, timestamp: currentTimestamp };
   localStorage.setItem(key, JSON.stringify(dataToSave));

@@ -1,5 +1,5 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+
 import {
   Box,
   Button,
@@ -7,14 +7,16 @@ import {
   Container,
   TextField,
   Typography,
-} from "@mui/material";
-import { motion } from "framer-motion";
-import validator from "validator";
-import { ApiResponse } from "./VirusTotalTypes";
-import Report from "./Report";
+} from '@mui/material';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import validator from 'validator';
+
+import Report from './Report';
+import { ApiResponse } from './VirusTotalTypes';
 
 const VirusTotalCheck = () => {
-  const [domain, setDomain] = useState("");
+  const [domain, setDomain] = useState('');
   const [report, setReport] = useState<null | ApiResponse>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
@@ -32,28 +34,39 @@ const VirusTotalCheck = () => {
     setLoading(true);
     const url = `/api/virustotal/${domain}`;
     try {
-      const response = await axios.get(url);
+      const response = await axios.get<ApiResponse>(url);
       setReport(response.data);
     } catch (error) {
-      setError("Error during VirusTotal API request");
+      setError('Error during VirusTotal API request');
       setReport(null);
     }
     setLoading(false);
   };
 
-  const handleFormSubmit = (event: FormEvent) => {
+  const handleFormSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    checkDomain();
+    try {
+      await checkDomain();
+    } catch (err) {
+      setError('An error occurred while submitting the form.');
+    }
+  };
+
+  const handleFormSubmitWrapper = (event: FormEvent) => {
+    event.preventDefault();
+    handleFormSubmit(event).catch(() => {
+      setError('An error occurred while submitting the form.');
+    });
   };
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
+        
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
       }}
     >
       <Container maxWidth="sm">
@@ -64,12 +77,12 @@ const VirusTotalCheck = () => {
         >
           <Box
             component="form"
-            onSubmit={handleFormSubmit}
+            onSubmit={handleFormSubmitWrapper}
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
             }}
           >
             <Typography variant="h4" gutterBottom>
@@ -86,12 +99,10 @@ const VirusTotalCheck = () => {
             <Button
               color="primary"
               variant="contained"
-              onClick={checkDomain}
               size="large"
               disabled={!isDomainValid(domain)}
-              type="submit"
             >
-              Check Domain
+            Check Domain
             </Button>
             {loading && (
               <Box sx={{ mt: 2, mb: 4 }}>

@@ -1,6 +1,6 @@
-import apiClient from "../../service/apiClientBase";
+import apiClient from '../../service/apiClientBase';
 
-const saveDataToLocalStorage = (key: string, data: any) => {
+const saveDataToLocalStorage = (key: string, data: unknown) => {
   const currentTimestamp = new Date().toISOString();
   const dataToSave = { data, timestamp: currentTimestamp };
   localStorage.setItem(key, JSON.stringify(dataToSave));
@@ -33,7 +33,7 @@ export const getTopScorers = async (season: string, league: string) => {
   }
 
   try {
-    const response = await apiClient.get("/players/topscorers", {
+    const response = await apiClient.get('/players/topscorers', {
       params: {
         season,
         league,
@@ -56,7 +56,7 @@ export const getTeams = async (league: string, season: string) => {
   }
 
   try {
-    const response = await apiClient.get("/teams", {
+    const response = await apiClient.get('/teams', {
       params: {
         league,
         season,
@@ -74,7 +74,7 @@ export const getTeams = async (league: string, season: string) => {
 
 export const getLeagues = async () => {
   try {
-    const response = await apiClient.get("/leagues");
+    const response = await apiClient.get('/leagues');
 
     if (response && response.data && response.data.response) {
       const extractedData = {
@@ -84,7 +84,7 @@ export const getLeagues = async () => {
       };
       return extractedData;
     } else {
-      console.error("Failed to extract necessary data from response:", response);
+      console.error('Failed to extract necessary data from response:', response);
     }
   } catch (error) {
     console.error(error);

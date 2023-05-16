@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+
 import { Skeleton } from "@mui/lab";
 import {
   Grid,
@@ -9,12 +10,14 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
-import GameCard from "./GameCard";
-import StreamerCard from "./StreamerCard";
-import Pagination from "./Pagination";
-import { getConfig, getTwitchApiCall } from "./twitch-api";
-import "./TwitchApi.css";
 import { range, debounce } from "lodash";
+
+import GameCard from "./GameCard";
+import Pagination from "./Pagination";
+import StreamerCard from "./StreamerCard";
+import { getConfig, getTwitchApiCall } from "./twitch-api";
+
+import "./TwitchApi.css";
 
 interface TwitchGameData {
   id: string;
@@ -27,6 +30,11 @@ interface StreamerData {
   user_name: string;
   viewer_count: number;
 }
+const paperSx = { padding: "1rem", marginTop: "1rem", marginBottom: "1.5rem" };
+
+const typographySx = { fontWeight: "bold" };
+
+const dividerSx = { marginTop: "0.5rem", marginBottom: "0.5rem" };
 
 const TwitchApi: React.FC = () => {
   const [games, setGames] = useState<TwitchGameData[]>([]);
@@ -39,6 +47,7 @@ const TwitchApi: React.FC = () => {
   const itemsPerPage = 24;
   const [paginationCursor, setPaginationCursor] = useState<string | null>(null);
 
+  const growInProps = useMemo(() => ({ in: !loading }), [loading]);
   const fetchStreamers = async (
     gameId: string,
     usePaginationCursor: boolean,
@@ -98,7 +107,7 @@ const TwitchApi: React.FC = () => {
       fetchStreamers(selectedGame, usePaginationCursor, currentPage).catch(
         (error) => {
           if (isMounted) {
-            setError("Failed to fetch streamers. Please try again later.");
+            error("Failed to fetch streamers. Please try again later.");
           }
         }
       );
@@ -110,44 +119,50 @@ const TwitchApi: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGame, currentPage]);
 
-  const debouncedHandleGameClick = debounce((gameId: string) => {
-    setSelectedGame(gameId);
-    setCurrentPage(1);
-    setPaginationCursor(null);
-  }, 250);
+  const debouncedHandleGameClick = useCallback((gameId: string) => {
+    const debouncedFunction = debounce(() => {
+      setSelectedGame(gameId);
+      setCurrentPage(1);
+      setPaginationCursor(null);
+    }, 250);
 
-  const handlePreviousPage = () => {
+    debouncedFunction();
+  }, []);
+  const handleGameClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      const gameId = event.currentTarget.getAttribute("data-game-id") || "";
+      debouncedHandleGameClick(gameId);
+    },
+    [debouncedHandleGameClick]
+  );
+
+  const handlePreviousPage = useCallback(() => {
     setCurrentPage((prevPage) => prevPage - 1);
-  };
+  }, []);
 
-  const handleNextPage = () => {
+  const handleNextPage = useCallback(() => {
     setCurrentPage((prevPage) => prevPage + 1);
-  };
+  }, []);
 
   return (
     <div>
       {loading && <div>Loading...</div>}
       {error && <div>{error}</div>}
 
-      <Paper
-        elevation={3}
-        style={{ padding: "1rem", marginTop: "1rem", marginBottom: "1.5rem" }}
-      >
-        <Typography variant="h5" align="center" style={{ fontWeight: "bold" }}>
+      <Paper elevation={3} sx={paperSx}>
+        <Typography variant="h5" align="center" sx={typographySx}>
           Top Games
         </Typography>
-        <Divider
-          variant="middle"
-          style={{ marginTop: "0.5rem", marginBottom: "0.5rem" }}
-        />
+        <Divider variant="middle" sx={dividerSx} />
         <Grid container spacing={2} className="game-grid">
           {games.map((game) => (
             <Grid item xs={12} sm={6} md={4} lg={2} key={game.id}>
-              <Grow in={!loading}>
+              <Grow {...growInProps}>
                 <GameCard
                   game={game}
-                  onClick={() => debouncedHandleGameClick(game.id)}
+                  onClick={handleGameClick} // Pass handleGameClick directly
                   isActive={selectedGame === game.id}
+                  gameId={game.id}
                 />
               </Grow>
             </Grid>
@@ -176,7 +191,7 @@ const TwitchApi: React.FC = () => {
                   </Grid>
                 ))
               : streamers.map((streamer) => (
-                  <StreamerCard streamer={streamer} />
+                  <StreamerCard key={streamer.id} streamer={streamer} />
                 ))}
           </Grid>
 

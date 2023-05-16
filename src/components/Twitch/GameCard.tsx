@@ -8,16 +8,18 @@ interface GameCardProps {
     name: string;
     box_art_url: string;
   };
-  onClick: () => void;
-  isActive: boolean; // Add this prop
+  onClick: (event: React.MouseEvent<HTMLDivElement>) => void; // Update the type here
+  isActive: boolean;
+  gameId: string;
 }
 
 const GameCard = forwardRef<HTMLDivElement, GameCardProps>(
-  ({ game, onClick, isActive }, ref) => (
+  ({ game, onClick, isActive, gameId }, ref) => (
     <Card
       ref={ref}
-      className={`game-card ${isActive ? "active" : ""}`} 
-      onClick={onClick}
+      className={`game-card ${isActive ? "active" : ""}`}
+      onClick={onClick} 
+      data-game-id={gameId} 
     >
       <CardMedia
         component="img"
@@ -39,5 +41,6 @@ const GameCard = forwardRef<HTMLDivElement, GameCardProps>(
     </Card>
   )
 );
+GameCard.displayName = "GameCard";
 
 export default GameCard;

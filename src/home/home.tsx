@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+
 import {
   Box,
   CircularProgress,
   CssBaseline,
-} from "@mui/material";
-import { Container } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+} from '@mui/material';
+import { Container } from 'react-bootstrap';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import BackgroundParticles from '../components/BackgroundParticles';
+
+import { AvatarSection } from './AvatarSection';
+import { ContactSection } from './ContactSection';
+import { PortfolioSection } from './PortfolioSection';
+import { SkillsSection } from './SkillsSection';
 import { DarkBox } from './StyledComponents';
-import { AvatarSection } from "./AvatarSection";
-import { SkillsSection } from "./SkillsSection";
-import { PortfolioSection } from "./PortfolioSection";
-import { ContactSection } from "./ContactSection";
 
 interface User {
   _id: string;
@@ -35,6 +39,7 @@ function Home({ user }: HomeProps) {
 
   return (
     <Box>
+      <BackgroundParticles />
       <CssBaseline />
       {loading ? (
         <Box display="flex" justifyContent="center">

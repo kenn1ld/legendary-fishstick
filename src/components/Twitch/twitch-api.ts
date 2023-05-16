@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 const clientId = '65c87wwt7b8odaqd7b0hzgulachem3';
 const clientSecret = 'b50zus7u1znwejg8uvgzztqbbkdmu2';
@@ -20,12 +20,11 @@ export async function getConfig() {
   };
 }
 
-export function getTwitchApiCall(url: string, config: any) {
+export function getTwitchApiCall(url: string, config: AxiosRequestConfig) {
   return axios.get(url, config);
 }
 
-export function postTwitchApiCall(url: string, config: any) {
+export function postTwitchApiCall(url: string, config: AxiosRequestConfig) {
   return axios.post(url, config);
 }
-
 

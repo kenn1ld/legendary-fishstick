@@ -1,6 +1,10 @@
-import React, { useState, FormEvent } from "react";
-import useAuth from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import React, { useState, FormEvent } from 'react';
+
+import LockIcon from '@mui/icons-material/Lock';
+import MailIcon from '@mui/icons-material/Mail';
+import PersonIcon from '@mui/icons-material/Person';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {
   Container,
   OutlinedInput,
@@ -11,15 +15,14 @@ import {
   InputAdornment,
   IconButton,
   FormControl,
-} from "@mui/material";
-import { motion } from "framer-motion";
-import PersonIcon from "@mui/icons-material/Person";
-import MailIcon from "@mui/icons-material/Mail";
-import LockIcon from "@mui/icons-material/Lock";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Logo from "../components/Logo";
-import AnimatedButton from "../components/AnimatedButton";
+} from '@mui/material';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
+import AnimatedButton from '../components/AnimatedButton';
+import BackgroundParticles from '../components/BackgroundParticles';
+import Logo from '../components/Logo';
+import useAuth from '../hooks/useAuth';
 const fadeIn = {
   initial: { opacity: 0 },
   animate: {
@@ -42,12 +45,12 @@ const scaleUp = {
 
 
 const SignupPage = () => {
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
 
   const { registerUser } = useAuth();
   const navigate = useNavigate();
@@ -56,19 +59,19 @@ const SignupPage = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError('Passwords do not match');
       return;
     }
 
     try {
       await registerUser({ name, email, username }, password);
-      setError("");
-      alert("User registered successfully");
+      setError('');
+      alert('User registered successfully');
 
       // Redirect to login page after successful registration
-      navigate("/login");
+      navigate('/login');
     } catch (err) {
-      setError("Error registering user");
+      setError('Error registering user');
     }
   };
 
@@ -77,24 +80,37 @@ const SignupPage = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-    const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
-    const handleClickShowConfirmPassword = () => {
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const handleClickShowConfirmPassword = () => {
     setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
   };
 
   return (
+    
     <Container maxWidth="sm">
+      
       <motion.div
         initial="initial"
         animate="animate"
         variants={fadeIn}
-        style={{ marginTop: "2rem" }}
+        style={{ marginTop: '2rem' }}
       >
         <Logo />
 
         <Typography variant="h4" gutterBottom color="textPrimary">
           Signup
         </Typography>
+
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            zIndex: -1,
+          }}
+        >
+          <BackgroundParticles />
+        </div>
 
         <motion.form
           onSubmit={handleSubmit}
@@ -103,8 +119,8 @@ const SignupPage = () => {
           variants={scaleUp}
           style={{
             backgroundColor: useTheme().palette.background.paper,
-            padding: "2rem",
-            borderRadius: "10px",
+            padding: '2rem',
+            borderRadius: '10px',
           }}
         >
           <Grid container spacing={2}>
@@ -167,7 +183,7 @@ const SignupPage = () => {
                 <InputLabel htmlFor="passwordInputSignUp">Password</InputLabel>
                 <OutlinedInput
                   id="passwordInputSignUp"
-                  type={isPasswordVisible ? "text" : "password"}
+                  type={isPasswordVisible ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   startAdornment={
@@ -199,7 +215,7 @@ const SignupPage = () => {
                 <InputLabel htmlFor="confirmPasswordInput">Confirm Password</InputLabel>
                 <OutlinedInput
                   id="confirmPasswordInput"
-                  type={isConfirmPasswordVisible ? "text" : "password"}
+                  type={isConfirmPasswordVisible ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   startAdornment={
@@ -244,7 +260,7 @@ const SignupPage = () => {
                 variant="outlined"
                 color="primary"
                 fullWidth
-                onClick={() => navigate("/login")}
+                onClick={() => navigate('/login')}
               >
                 Go to Login
               </AnimatedButton>

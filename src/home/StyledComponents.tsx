@@ -1,9 +1,10 @@
-import { styled } from "@mui/system";
-import { Avatar, Typography, Paper, Box } from "@mui/material";
+// StyledComponents.ts
+import { Avatar, Typography, Paper, Box } from '@mui/material';
+import { styled } from '@mui/system';
 
 export const DarkBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.grey[900],
-  width: "100%",
+  width: '100%',
   paddingTop: theme.spacing(3),
   paddingBottom: theme.spacing(3),
 }));
@@ -24,11 +25,11 @@ export const WelcomeText = styled(Typography)(({ theme }) => ({
 
 export const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
-  minHeight: "200px",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
+  minHeight: '200px',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
 }));
 
 export const StyledCard = styled(Paper)(({ theme }) => ({

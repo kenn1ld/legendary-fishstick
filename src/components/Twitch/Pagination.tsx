@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, IconButton, Typography } from '@mui/material';
+
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { debounce } from 'lodash';
 
 interface PaginationProps {

@@ -1,39 +1,35 @@
-// App.tsx
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import Home from "./home/home";
-import SignupPage from "./signup/signup";
-import LoginPage from "./pages/login/login";
-import GlobalHeader from "./header/globalheader";
-import { User } from "./interface/user";
-import useAuth from "./hooks/useAuth";
-import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
-import ApiPage from "./apipage/apiPage";
-import Football from "components/Football/Football";
+import React, { useState, useEffect, useCallback, useMemo, CSSProperties } from 'react';
 
-const theme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#32cd32",
-    },
-  },
-});
+import {ThemeProvider, CssBaseline } from '@mui/material';
+import Football from './components/Football/Football';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+
+import ApiPage from './apipage/apiPage';
+import GlobalHeader from './header/globalheader';
+import Home from './home/home';
+import useAuth from './hooks/useAuth';
+import { User } from './interface/user';
+import LoginPage from './pages/login/login';
+import SignupPage from './signup/signup';
+import theme from './theme';
+
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { getUser } = useAuth();
-
+  const appStyle = useMemo<CSSProperties>(() => {
+  return { position: 'relative', minHeight: '100vh' };
+}, []);
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+    const storedToken = localStorage.getItem('token');
 
     if (storedToken) {
-      (async () => {
+      void (async () => {
         try {
           setUser(await getUser(storedToken));
         } catch (err) {
-          console.error("Error getting user information:", err);
+          console.error('Error getting user information:', err);
           localStorage.clear();
         }
         setIsLoading(false);
@@ -43,10 +39,14 @@ function App() {
     }
   }, [getUser]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.clear();
     setUser(null);
-  };
+  }, []);
+
+  const homeElement = useMemo(() => {
+    return user ? <Home user={user} /> : <Navigate replace to="/login" />;
+  }, [user]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -56,7 +56,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <div className="App" style={{ position: "relative", minHeight: "100vh" }}>
+        <div className="App" style={appStyle}>
           <GlobalHeader
             title="Kenneth's Portfolio"
             user={user}
@@ -65,7 +65,7 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={user ? <Home user={user} /> : <Navigate replace to="/login" />}
+              element={homeElement}
             />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage setUser={setUser} />} />
@@ -77,5 +77,4 @@ function App() {
     </ThemeProvider>
   );
 }
-
 export default App;

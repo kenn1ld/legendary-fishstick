@@ -1,7 +1,9 @@
-import React, { useState, FormEvent, Dispatch } from "react";
-import { useNavigate } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
-import { User } from "../../interface/user";
+import React, { useState, FormEvent, Dispatch, useCallback } from 'react';
+
+import LockIcon from '@mui/icons-material/Lock';
+import MailIcon from '@mui/icons-material/Mail';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import {
   Container,
   OutlinedInput,
@@ -13,16 +15,15 @@ import {
   InputAdornment,
   IconButton,
   FormControl,
-} from "@mui/material";
-import { motion } from "framer-motion";
-import MailIcon from "@mui/icons-material/Mail";
-import LockIcon from "@mui/icons-material/Lock";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Logo from "../../components/Logo"
-import AnimatedButton from "../../components/AnimatedButton";
-import BackgroundParticles from "components/BackgroundParticles";
+} from '@mui/material';
+import BackgroundParticles from '../../components/BackgroundParticles';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
+import AnimatedButton from '../../components/AnimatedButton';
+import Logo from '../../components/Logo';
+import useAuth from '../../hooks/useAuth';
+import { User } from '../../interface/user';
 
 interface LoginPageProps {
   setUser: Dispatch<React.SetStateAction<User | null>>;
@@ -30,8 +31,10 @@ interface LoginPageProps {
 
 const fadeIn = {
   initial: { opacity: 0 },
+
   animate: {
     opacity: 1,
+
     transition: {
       duration: 1,
     },
@@ -40,79 +43,84 @@ const fadeIn = {
 
 const scaleUp = {
   initial: { scale: 0 },
+
   animate: {
     scale: 1,
+
     transition: {
       duration: 0.5,
     },
   },
 };
 
-
-
 const LoginPage = ({ setUser }: LoginPageProps) => {
   const [email, setEmail] = useState('');
+
   const [password, setPassword] = useState('');
+
   const [error, setError] = useState('');
+
   const theme = useTheme();
 
   const navigate = useNavigate();
+
   const { loginUser, getUser } = useAuth();
 
-  const handleSubmit = async (e: FormEvent) => {
+ const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
-      const token = await loginUser(email, password);
+    loginUser(email, password)
+      .then((token) => {
+        setError('');
 
-      // Clear any previous errors
-      setError('');
+        localStorage.setItem('token', token);
 
-      // Store token in localStorage and update state
-      localStorage.setItem('token', token);
+        return getUser(token);
+      })
 
-      // Get user information and update state
-      const userData = await getUser(token);
-      setUser(userData);
+      .then((userData) => {
+        setUser(userData);
 
-      // Redirect to the home page after successful login
-      navigate('/');
-    } catch (err) {
-      setError('Error logging in user');
-    }
-  };
+        navigate('/');
+      })
 
-  const goToSignup = () => {
+      .catch(() => {
+        setError('Error logging in user');
+      });
+  }, [loginUser, email, password, setError, setUser, navigate, getUser]); 
+
+const goToSignup = useCallback(() => {
     navigate('/signup');
-  };
+  }, [navigate]); // Add your dependencies here
 
-   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const handleClickShowPassword = () => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  function handleClickShowPassword() {
     setIsPasswordVisible(!isPasswordVisible);
-  };
+  }
 
- return (
-   <Container maxWidth="sm">
-    <motion.div
-      initial="initial"
-      animate="animate"
-      variants={fadeIn}
-      style={{ marginTop: "2rem", position: "relative" }}
-    >
-      {/* Add the BackgroundParticles component wrapped in the parent div */}
-      <div
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          zIndex: -1,
-        }}
+  return (
+    <Container maxWidth="sm">
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={fadeIn}
+        style={{ marginTop: '2rem', position: 'relative' }}
       >
-        <BackgroundParticles />
-      </div>
+        <div
+          style={{
+            position: 'absolute',
 
-        {/* Display a logo/icon */}
-      
+            width: '100%',
+
+            height: '100%',
+
+            zIndex: -1,
+          }}
+        >
+          <BackgroundParticles />
+        </div>
+
         <Logo />
 
         <Typography variant="h4" gutterBottom color="textPrimary">
@@ -126,8 +134,10 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
           variants={scaleUp}
           style={{
             backgroundColor: theme.palette.background.paper,
-            padding: "2rem",
-            borderRadius: "10px",
+
+            padding: '2rem',
+
+            borderRadius: '10px',
           }}
         >
           <Grid container spacing={2}>
@@ -139,6 +149,7 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
                 >
                   Email
                 </InputLabel>
+
                 <OutlinedInput
                   id="emailInput"
                   type="email"
@@ -166,9 +177,10 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
                 >
                   Password
                 </InputLabel>
+
                 <OutlinedInput
                   id="passwordInput"
-                  type={isPasswordVisible ? "text" : "password"}
+                  type={isPasswordVisible ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   startAdornment={
@@ -178,10 +190,7 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
                   }
                   endAdornment={
                     <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        onClick={handleClickShowPassword}
-                      >
+                      <IconButton edge="end" onClick={handleClickShowPassword}>
                         {isPasswordVisible ? (
                           <Visibility color="action" />
                         ) : (
@@ -206,19 +215,18 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
             )}
 
             <Grid item xs={12}>
-               <AnimatedButton type="submit" fullWidth>
-              Login
-          </AnimatedButton>
+              <AnimatedButton type="submit" fullWidth>
+                Login
+              </AnimatedButton>
+            </Grid>
           </Grid>
-        </Grid>
-      </motion.form>
-        <Box sx={{ mt: 2, textAlign: "center" }}>
+        </motion.form>
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
           <Typography variant="body2" color="textSecondary">
-            Don't have an account?{" "}
-            
+            Don&apos;t have an account?{' '}
             <AnimatedButton
               onClick={goToSignup}
-              style={{ textTransform: "none", fontWeight: "bold" }}
+              style={{ textTransform: 'none', fontWeight: 'bold' }}
             >
               Sign up
             </AnimatedButton>

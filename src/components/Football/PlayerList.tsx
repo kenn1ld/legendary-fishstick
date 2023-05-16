@@ -1,6 +1,14 @@
-import React from 'react';
-import { Box, Card, Typography, CardContent, CardMedia, CardActionArea, Grid } from '@mui/material';
-import Particles from 'react-tsparticles';
+import React from "react";
+
+import {
+  Box,
+  Card,
+  Typography,
+  CardContent,
+  CardMedia,
+  CardActionArea,
+  Grid,
+} from "@mui/material";
 
 export interface Player {
   player: {
@@ -98,6 +106,9 @@ interface PlayerListProps {
   players: Player[];
 }
 
+const cardSx = { maxWidth: 345 };
+const boxSx = { flexGrow: 1 };
+
 const PlayerList: React.FC<PlayerListProps> = ({ players }) => {
   const renderPlayerStatistics = (player: Player) => {
     const stats = player.statistics[0];
@@ -106,61 +117,15 @@ const PlayerList: React.FC<PlayerListProps> = ({ players }) => {
       `;
   };
 
-  console.log('players prop value in PlayerList:', players);
-
   return (
     <>
-      <Particles
-        id="tsparticles"
-        options={{
-         
-          particles: {
-            color: {
-              value: '#ff9800',
-            },
-            links: {
-              color: {
-                value: '#ff9800',
-              },
-            },
-            move: {
-              attract: {
-                rotate: {
-                  x: 600,
-                  y: 1200,
-                },
-              },
-            },
-            number: {
-              density: {
-                enable: true,
-              },
-              value: 80,
-            },
-            opacity: {
-              value: 0.5,
-              anim: {
-                enable: true,
-              },
-            },
-            size: {
-              value: 3,
-              random: true,
-              anim: {
-                enable: true,
-                speed: 3,
-              },
-            },
-          },
-        }}
-      />
-      <Box sx={{ flexGrow: 1 }}>
+      <Box sx={boxSx}>
         <Grid container spacing={2}>
           {players.map((player, index) => {
             const stats = player.statistics[0];
             return (
               <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card sx={{ maxWidth: 345 }}>
+                <Card sx={cardSx}>
                   <CardActionArea>
                     <CardMedia
                       component="img"
@@ -175,15 +140,19 @@ const PlayerList: React.FC<PlayerListProps> = ({ players }) => {
                       <Typography variant="body2" color="text.secondary">
                         {renderPlayerStatistics(player)}
                         <br />
-                        {stats.dribbles.attempts} dribble attempts, {stats.dribbles.success} successful dribbles
+                        {stats.dribbles.attempts} dribble attempts,{" "}
+                        {stats.dribbles.success} successful dribbles
                         <br />
                         {stats.passes.key} key passes
                         <br />
-                        {stats.tackles.blocks} blocks, {stats.tackles.interceptions} interceptions
+                        {stats.tackles.blocks} blocks,{" "}
+                        {stats.tackles.interceptions} interceptions
                         <br />
-                        {stats.fouls.drawn} fouls drawn, {stats.fouls.committed} fouls committed
+                        {stats.fouls.drawn} fouls drawn, {stats.fouls.committed}{" "}
+                        fouls committed
                         <br />
-                        {stats.penalty.scored} penalties scored, {stats.penalty.missed} penalties missed,{' '}
+                        {stats.penalty.scored} penalties scored,{" "}
+                        {stats.penalty.missed} penalties missed,{" "}
                         {stats.penalty.won} penalties won
                       </Typography>
                     </CardContent>
