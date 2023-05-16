@@ -7,6 +7,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Link as RouterLink } from 'react-router-dom';
 import CodeIcon from '@mui/icons-material/Code';
+import { debounce } from 'lodash';
 
 interface User {
   _id: string;
@@ -23,11 +24,11 @@ interface GlobalHeaderProps {
 }
 
 const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, user, onLogout }) => {
-  const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    }
-  };
+  const debouncedHandleLogout = debounce(() => {
+  if (onLogout) {
+    onLogout();
+  }
+}, 250); // You can adjust the debounce delay in milliseconds as needed
 
   return (
     <AppBar position="static" elevation={1} color="default" sx={{ marginBottom: '1rem' }}>
@@ -69,7 +70,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ title, user, onLogout }) =>
           {user ? (
             <>
               {/* Logout icon */}
-              <IconButton sx={{ color: "limegreen" }} onClick={handleLogout}>
+              <IconButton sx={{ color: "limegreen" }} onClick={debouncedHandleLogout}>
                 <LogoutIcon />
               </IconButton>
             </>

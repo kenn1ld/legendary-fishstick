@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Grid, Card, CardContent, Typography, Avatar, CircularProgress } from '@mui/material';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  CircularProgress,
+} from "@mui/material";
 
 interface CryptoData {
   id: string;
@@ -11,6 +18,30 @@ interface CryptoData {
   image: string;
 }
 
+const saveDataToLocalStorage = (key: string, data: any) => {
+  const currentTimestamp = new Date().toISOString();
+  const dataToSave = { data, timestamp: currentTimestamp };
+  localStorage.setItem(key, JSON.stringify(dataToSave));
+};
+
+const loadDataFromLocalStorage = (key: string) => {
+  const savedData = localStorage.getItem(key);
+  if (!savedData) {
+    return null;
+  }
+  const parsedData = JSON.parse(savedData);
+
+  const tenHoursInMs = 10 * 60 * 60 * 1000; // Updated the duration
+  const savedDataTimestamp = new Date(parsedData.timestamp);
+  const now = new Date();
+
+  if (now.getTime() - savedDataTimestamp.getTime() > tenHoursInMs) {
+    localStorage.removeItem(key);
+    return null;
+  }
+  return parsedData.data;
+};
+
 const CryptoCurrency: React.FC = () => {
   const [cryptos, setCryptos] = useState<CryptoData[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -18,18 +49,27 @@ const CryptoCurrency: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=12&page=1&sparkline=false'
-        );
-        setCryptos(response.data);
+      const localStorageKey = "crypto_data";
+      const savedData = loadDataFromLocalStorage(localStorageKey);
+
+      if (savedData) {
+        setCryptos(savedData);
         setError(null);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to fetch data. Please try again later.');
+      } else {
+        setLoading(true);
+        try {
+          const response = await axios.get(
+            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=12&page=1&sparkline=false"
+          );
+          setCryptos(response.data);
+          setError(null);
+          saveDataToLocalStorage(localStorageKey, response.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setError("Failed to fetch data. Please try again later.");
+        }
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchData();
@@ -52,7 +92,7 @@ const CryptoCurrency: React.FC = () => {
                   Worth per coin (USD): ${crypto.current_price.toFixed(2)}
                 </Typography>
                 <Typography
-                  color={crypto.price_change_percentage_24h >= 0 ? 'primary' : 'error'}
+                  color={crypto.price_change_percentage_24h >= 0 ? "primary" : "error"}
                 >
                   Change (24h): {crypto.price_change_percentage_24h.toFixed(2)}%
                 </Typography>
