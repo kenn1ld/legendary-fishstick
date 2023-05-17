@@ -12,7 +12,7 @@ import { User } from './interface/user';
 import LoginPage from './pages/login/login';
 import SignupPage from './signup/signup';
 import theme from './theme';
-
+import FootballData from './components/Football/FootballData';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -70,7 +70,8 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage setUser={setUser} />} />
             <Route path="/ApiPlayground" element={<ApiPage />} />
-            <Route path="/Football" element={<Football/>} />
+            <Route path="/Football" element={<Football />} />
+            <Route path="/FootballData" element={<FootballData/>} />
           </Routes>
         </div>
       </Router>

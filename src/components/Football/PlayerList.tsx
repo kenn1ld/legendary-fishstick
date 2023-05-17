@@ -18,6 +18,7 @@ interface PlayerListProps {
 }
 
 const PlayerList: React.FC<PlayerListProps> = ({ players }) => {
+  console.log('PlayerList players:', players);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   const renderPlayerStatistics = (player: Player) => {

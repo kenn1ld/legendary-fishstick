@@ -1,16 +1,16 @@
 import express, { json } from "express";
+
 import { connect } from "mongoose";
-import userRoutes from "./routes/users";
-import authRoutes from "./routes/auth";
-import weatherRoutes from "./routes/weather"; // Import weather routes
-import { get } from "axios";
+import userRoutes from "./routes/users.js";
+import authRoutes from "./routes/auth.js";
+import pkg from "axios";
 import cors from "cors";
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(json());
 app.use(cors());
-
+const { get } = pkg;
 // Connect to MongoDB
 const dbURI =
   "mongodb+srv://kennethskjellvik:Random123%3C@cluster0.zyk0ysm.mongodb.net/test";
@@ -22,7 +22,6 @@ connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Use the userRoutes, authRoutes, and weatherRoutes middleware
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/weather", weatherRoutes); // Use weather routes
 
 // Add the following route for the VirusTotal API
 app.get("/api/virustotal/:domain", async (req, res) => {

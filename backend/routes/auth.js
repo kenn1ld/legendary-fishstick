@@ -2,9 +2,10 @@ import { Router } from "express";
 const router = Router();
 import { model } from "mongoose";
 import { hash, compare } from "bcrypt";
-import { verify, sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 const User = model("User");
+const { verify, sign } = jwt;
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.header("Authorization");

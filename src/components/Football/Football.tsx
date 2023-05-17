@@ -6,6 +6,7 @@ import { getLeagues, getTopScorers } from './FootballApi';
 import LeagueSelect from './LeagueSelect';
 import PlayerList from './PlayerList';
 import SeasonSelect from './SeasonSelect';
+
 import { Player } from './Player';
 interface League {
   id: number;
@@ -51,9 +52,14 @@ const FootballComponent: React.FC = () => {
   }, []);
 
   const handleClick = useCallback(async () => {
+    console.log('Button clicked');
+    console.log('Selected league:', selectedLeague, 'Selected season:', selectedSeason);
+
     if (selectedLeague && selectedSeason) {
       try {
-        const scorersData = await getTopScorers(selectedSeason, selectedLeague);
+        const scorersData = await getTopScorers(parseInt(selectedSeason), parseInt(selectedLeague));
+        console.log('Scorers data:', scorersData);
+
         if (scorersData && scorersData.response) {
           setTopScorers(scorersData.response);
           setError('');
@@ -66,6 +72,8 @@ const FootballComponent: React.FC = () => {
       console.log('League or season not selected.');
     }
   }, [selectedLeague, selectedSeason]);
+
+  
 
   return (
     <div>

@@ -1,5 +1,8 @@
 module.exports = {
   mode: "development", // set mode option, 'development' or 'production'
+  devServer: {
+    allowedHosts: "all",
+  },
   module: {
     rules: [
       {
