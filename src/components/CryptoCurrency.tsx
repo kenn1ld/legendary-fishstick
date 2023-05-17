@@ -8,6 +8,7 @@ import {
   Avatar,
   CircularProgress,
 } from "@mui/material";
+import { saveData, loadData } from "../config/indexedDBConfig";
 
 interface CryptoData {
   id: string;
@@ -18,43 +19,21 @@ interface CryptoData {
   image: string;
 }
 
-const saveDataToLocalStorage = (key: string, data: unknown) => {
-  const currentTimestamp = new Date().toISOString();
-  const dataToSave = { data, timestamp: currentTimestamp };
-  localStorage.setItem(key, JSON.stringify(dataToSave));
-};
-
-const loadDataFromLocalStorage = (key: string) => {
-  const savedData = localStorage.getItem(key);
-  if (!savedData) {
-    return null;
-  }
-  const parsedData = JSON.parse(savedData);
-
-  const tenHoursInMs = 10 * 60 * 60 * 1000; // Updated the duration
-  const savedDataTimestamp = new Date(parsedData.timestamp);
-  const now = new Date();
-
-  if (now.getTime() - savedDataTimestamp.getTime() > tenHoursInMs) {
-    localStorage.removeItem(key);
-    return null;
-  }
-  return parsedData.data;
-};
-
 const CryptoCurrency: React.FC = () => {
   const [cryptos, setCryptos] = useState<CryptoData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const localStorageKey = "crypto_data";
-      const savedData = loadDataFromLocalStorage(localStorageKey);
+      const savedData = await loadData(localStorageKey, 0.16);  // 0.16 hours = 10 minutes
 
       if (savedData) {
         setCryptos(savedData);
         setError(null);
+        setLastUpdated(new Date()); // update lastUpdated state when data is loaded
       } else {
         setLoading(true);
         try {
@@ -63,7 +42,8 @@ const CryptoCurrency: React.FC = () => {
           );
           setCryptos(response.data);
           setError(null);
-          saveDataToLocalStorage(localStorageKey, response.data);
+          setLastUpdated(new Date()); // update lastUpdated state when new data is fetched
+          await saveData(localStorageKey, response.data);
         } catch (error) {
           console.error("Error fetching data:", error);
           setError("Failed to fetch data. Please try again later.");
@@ -79,6 +59,9 @@ const CryptoCurrency: React.FC = () => {
     <div>
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
+      <Typography variant="subtitle2">
+        Last updated: {lastUpdated ? lastUpdated.toLocaleString() : "Loading..."}
+      </Typography>
       <Grid container spacing={2}>
         {cryptos.map((crypto) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={crypto.id}>

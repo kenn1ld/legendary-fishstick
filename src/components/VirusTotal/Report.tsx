@@ -7,7 +7,7 @@ import { Box, Chip, Divider, Grid, Typography, Button } from '@mui/material';
 import { green, red, orange } from '@mui/material/colors';
 import { styled } from '@mui/system';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 
 import { ApiResponse } from './VirusTotalTypes';
 
@@ -28,11 +28,11 @@ const Report: React.FC<ReportProps> = ({ report }) => {
 
     void html2canvas(input).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4'); // Set the PDF page format: Portrait, unit: mm, size: A4
-      const pageWidth = pdf.internal.pageSize.getWidth(); // get the width of the PDF page
-      const pageHeight = pdf.internal.pageSize.getHeight(); // get the height of the PDF page
-      const imgWidth = pageWidth - 20; // adjust the width based on margins
-      const imgHeight = (canvas.height * imgWidth) / canvas.width; // maintain the aspect ratio
+      const pdf = new jsPDF('p', 'mm', 'a4'); 
+      const pageWidth = pdf.internal.pageSize.getWidth(); 
+      const pageHeight = pdf.internal.pageSize.getHeight(); 
+      const imgWidth = pageWidth - 20; 
+      const imgHeight = (canvas.height * imgWidth) / canvas.width; 
 
       let heightLeft = imgHeight;
       let position = 0;

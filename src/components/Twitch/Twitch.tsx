@@ -19,6 +19,31 @@ import { getConfig, getTwitchApiCall } from "./twitch-api";
 
 import "./TwitchApi.css";
 
+const saveDataToLocalStorage = (key: string, data: unknown) => {
+  const currentTimestamp = new Date().toISOString();
+  const dataToSave = { data, timestamp: currentTimestamp };
+  localStorage.setItem(key, JSON.stringify(dataToSave));
+};
+
+const loadDataFromLocalStorage = (key: string) => {
+  const savedData = localStorage.getItem(key);
+  if (!savedData) {
+    return null;
+  }
+  const parsedData = JSON.parse(savedData);
+
+  const tenMinutesInMs = 10 * 60 * 1000; 
+  const savedDataTimestamp = new Date(parsedData.timestamp);
+  const now = new Date();
+
+  if (now.getTime() - savedDataTimestamp.getTime() > tenMinutesInMs) {
+    localStorage.removeItem(key);
+    return null;
+  }
+  return parsedData.data;
+};
+
+
 interface TwitchGameData {
   id: string;
   name: string;
@@ -76,8 +101,15 @@ const TwitchApi: React.FC = () => {
     setLoadingStreamers(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
+ useEffect(() => {
+  const fetchData = async () => {
+    const localStorageKey = "top_games_data";
+    const savedData = loadDataFromLocalStorage(localStorageKey);
+
+    if (savedData) {
+      setGames(savedData);
+      setError(null);
+    } else {
       setLoading(true);
       try {
         const config = await getConfig();
@@ -89,21 +121,31 @@ const TwitchApi: React.FC = () => {
 
         setGames(response.data.data);
         setError(null);
+        saveDataToLocalStorage(localStorageKey, response.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to fetch data. Please try again later.");
       }
       setLoading(false);
-    };
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
   useEffect(() => {
-    let isMounted = true; // Add this flag to track component's mounting state
+  let isMounted = true; // Add this flag to track component's mounting state
 
-    if (selectedGame) {
-      const usePaginationCursor = currentPage !== 1;
+  if (selectedGame) {
+    const usePaginationCursor = currentPage !== 1;
+
+    const localStorageKey = `streamers_data_${selectedGame}`;
+    const savedData = loadDataFromLocalStorage(localStorageKey);
+
+    if (savedData) {
+      setStreamers(savedData);
+      setError(null);
+    } else {
       fetchStreamers(selectedGame, usePaginationCursor, currentPage).catch(
         (error) => {
           if (isMounted) {
@@ -112,12 +154,13 @@ const TwitchApi: React.FC = () => {
         }
       );
     }
+  }
 
-    return () => {
-      isMounted = false; // Set the flag to false when the component is unmounted
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedGame, currentPage]);
+  return () => {
+    isMounted = false; // Set the flag to false when the component is unmounted
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [selectedGame, currentPage]);
 
   const debouncedHandleGameClick = useCallback((gameId: string) => {
     const debouncedFunction = debounce(() => {

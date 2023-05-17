@@ -4,15 +4,17 @@ import { SelectChangeEvent, Button, Typography } from '@mui/material';
 
 import { getLeagues, getTopScorers } from './FootballApi';
 import LeagueSelect from './LeagueSelect';
-import PlayerList, { Player } from './PlayerList';
+import PlayerList from './PlayerList';
 import SeasonSelect from './SeasonSelect';
-
+import { Player } from './Player';
 interface League {
   id: number;
   name: string;
 }
 
 const availableSeasonYears = [
+  '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007',
+  '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015',
   '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'
 ];
 

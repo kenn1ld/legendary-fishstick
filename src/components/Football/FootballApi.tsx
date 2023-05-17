@@ -1,32 +1,9 @@
 import apiClient from '../../service/apiClientBase';
-
-const saveDataToLocalStorage = (key: string, data: unknown) => {
-  const currentTimestamp = new Date().toISOString();
-  const dataToSave = { data, timestamp: currentTimestamp };
-  localStorage.setItem(key, JSON.stringify(dataToSave));
-};
-
-const loadDataFromLocalStorage = (key: string) => {
-  const savedData = localStorage.getItem(key);
-  if (!savedData) {
-    return null;
-  }
-  const parsedData = JSON.parse(savedData);
-
-  const oneDayInMs = 24 * 60 * 60 * 1000;
-  const savedDataTimestamp = new Date(parsedData.timestamp);
-  const now = new Date();
-
-  if (now.getTime() - savedDataTimestamp.getTime() > oneDayInMs) {
-    localStorage.removeItem(key);
-    return null;
-  }
-  return parsedData.data;
-};
+import { saveData, loadData } from '../../config/indexedDBConfig';
 
 export const getTopScorers = async (season: string, league: string) => {
-  const localStorageKey = `topScorers_${season}_${league}`;
-  const savedData = loadDataFromLocalStorage(localStorageKey);
+  const indexedDBKey = `topScorers_${season}_${league}`;
+  const savedData = await loadData(indexedDBKey, 24);  // 24 hours
 
   if (savedData) {
     return savedData;
@@ -40,7 +17,7 @@ export const getTopScorers = async (season: string, league: string) => {
       },
     });
 
-    saveDataToLocalStorage(localStorageKey, response.data);
+    await saveData(indexedDBKey, response.data);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -48,8 +25,8 @@ export const getTopScorers = async (season: string, league: string) => {
 };
 
 export const getTeams = async (league: string, season: string) => {
-  const localStorageKey = `teams_${league}_${season}`;
-  const savedData = loadDataFromLocalStorage(localStorageKey);
+  const indexedDBKey = `teams_${league}_${season}`;
+  const savedData = await loadData(indexedDBKey, 24); // 24 hours
 
   if (savedData) {
     return savedData;
@@ -63,16 +40,34 @@ export const getTeams = async (league: string, season: string) => {
       },
     });
 
-    saveDataToLocalStorage(localStorageKey, response.data);
-    return response.data;
+    console.log('response:', response); // Log the response object
+
+    const teamsData = response.data.response;
+
+    await saveData(indexedDBKey, teamsData);
+
+    if (Array.isArray(teamsData)) {
+      return teamsData;
+    } else {
+      throw new Error('Invalid teams data');
+    }
   } catch (error) {
     console.error(error);
+    throw new Error('Error fetching teams');
   }
 };
 
-// apiFunctions.ts
+
+
 
 export const getLeagues = async () => {
+  const indexedDBKey = 'leagues';
+  const savedData = await loadData(indexedDBKey, 24);  // 24 hours
+
+  if (savedData) {
+    return savedData;
+  }
+
   try {
     const response = await apiClient.get('/leagues');
 
@@ -82,6 +77,7 @@ export const getLeagues = async () => {
           response: response.data.response,
         },
       };
+      await saveData(indexedDBKey, extractedData);
       return extractedData;
     } else {
       console.error('Failed to extract necessary data from response:', response);

@@ -1,27 +1,28 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const userRoutes = require("./routes/users");
-const authRoutes = require("./routes/auth");
-const axios = require("axios");
-const cors = require("cors");
+import express, { json } from "express";
+import { connect } from "mongoose";
+import userRoutes from "./routes/users";
+import authRoutes from "./routes/auth";
+import weatherRoutes from "./routes/weather"; // Import weather routes
+import { get } from "axios";
+import cors from "cors";
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(express.json());
-app.use(cors()); // Add this line right after setting up express.json()
+app.use(json());
+app.use(cors());
 
 // Connect to MongoDB
 const dbURI =
   "mongodb+srv://kennethskjellvik:Random123%3C@cluster0.zyk0ysm.mongodb.net/test";
 
-mongoose
-  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-// Use the userRoutes and authRoutes middleware
+// Use the userRoutes, authRoutes, and weatherRoutes middleware
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/weather", weatherRoutes); // Use weather routes
 
 // Add the following route for the VirusTotal API
 app.get("/api/virustotal/:domain", async (req, res) => {
@@ -31,7 +32,7 @@ app.get("/api/virustotal/:domain", async (req, res) => {
   const url = `https://www.virustotal.com/api/v3/domains/${domain}`;
 
   try {
-    const response = await axios.get(url, { headers: { "x-apikey": apiKey } });
+    const response = await get(url, { headers: { "x-apikey": apiKey } });
     res.send(response.data);
   } catch (error) {
     console.error("Error during VirusTotal API request", error);

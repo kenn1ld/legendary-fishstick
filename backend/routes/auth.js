@@ -1,10 +1,10 @@
-const express = require("express");
-const router = express.Router();
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import { Router } from "express";
+const router = Router();
+import { model } from "mongoose";
+import { hash, compare } from "bcrypt";
+import { verify, sign } from "jsonwebtoken";
 
-const User = mongoose.model("User");
+const User = model("User");
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.header("Authorization");
@@ -16,7 +16,7 @@ const authMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(
+    const decoded = verify(
       token,
       "BT7b4mwRtPwuc5SHjxLN%M*$vSaSHCrHWgLor^222i*KDa*oBHYzBa@JmmP9^j*E4URS57gNfHiotVReJ$vAiJQ6sjC*xJ!P7CTDzucTbdSTNk*mUk4hxv@hbio7xVYt"
     );
@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
   try {
     console.log("Received request body:", req.body);
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await hash(req.body.password, 10);
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
@@ -55,15 +55,12 @@ router.post("/login", async (req, res) => {
       return res.status(404).send({ message: "User not found" });
     }
 
-    const validPassword = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
+    const validPassword = await compare(req.body.password, user.password);
     if (!validPassword) {
       return res.status(401).send({ message: "Invalid password" });
     }
 
-    const token = jwt.sign(
+    const token = sign(
       { _id: user._id },
       "BT7b4mwRtPwuc5SHjxLN%M*$vSaSHCrHWgLor^222i*KDa*oBHYzBa@JmmP9^j*E4URS57gNfHiotVReJ$vAiJQ6sjC*xJ!P7CTDzucTbdSTNk*mUk4hxv@hbio7xVYt",
       {
@@ -86,4 +83,4 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,8 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const mongoose = require("mongoose");
+import { Router } from "express";
+const router = Router();
+import { Schema, model } from "mongoose";
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   name: String,
   email: {
     type: String,
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   updatedAt: Date,
 });
 
-const User = mongoose.model("User", userSchema);
+const User = model("User", userSchema);
 
 //-----------------------------GET---------------------------------------------------//
 // Get all users
@@ -122,4 +122,4 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

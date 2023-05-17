@@ -1,9 +1,9 @@
-import React, { useState, FormEvent, Dispatch, useCallback } from 'react';
+import React, { useState, FormEvent, Dispatch, useCallback } from "react";
 
-import LockIcon from '@mui/icons-material/Lock';
-import MailIcon from '@mui/icons-material/Mail';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import LockIcon from "@mui/icons-material/Lock";
+import MailIcon from "@mui/icons-material/Mail";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Container,
   OutlinedInput,
@@ -15,15 +15,15 @@ import {
   InputAdornment,
   IconButton,
   FormControl,
-} from '@mui/material';
-import BackgroundParticles from '../../components/BackgroundParticles';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import BackgroundParticles from "../../components/BackgroundParticles";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
-import AnimatedButton from '../../components/AnimatedButton';
-import Logo from '../../components/Logo';
-import useAuth from '../../hooks/useAuth';
-import { User } from '../../interface/user';
+import AnimatedButton from "../../components/AnimatedButton";
+import Logo from "../../components/Logo";
+import useAuth from "../../hooks/useAuth";
+import { User } from "../../interface/user";
 
 interface LoginPageProps {
   setUser: Dispatch<React.SetStateAction<User | null>>;
@@ -54,11 +54,11 @@ const scaleUp = {
 };
 
 const LoginPage = ({ setUser }: LoginPageProps) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const theme = useTheme();
 
@@ -66,31 +66,34 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
 
   const { loginUser, getUser } = useAuth();
 
- const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-    loginUser(email, password)
-      .then((token) => {
-        setError('');
+      loginUser(email, password)
+        .then((token) => {
+          setError("");
 
-        localStorage.setItem('token', token);
+          localStorage.setItem("token", token);
 
-        return getUser(token);
-      })
+          return getUser(token);
+        })
 
-      .then((userData) => {
-        setUser(userData);
+        .then((userData) => {
+          setUser(userData);
 
-        navigate('/');
-      })
+          navigate("/");
+        })
 
-      .catch(() => {
-        setError('Error logging in user');
-      });
-  }, [loginUser, email, password, setError, setUser, navigate, getUser]); 
+        .catch(() => {
+          setError("Error logging in user");
+        });
+    },
+    [loginUser, email, password, setError, setUser, navigate, getUser]
+  );
 
-const goToSignup = useCallback(() => {
-    navigate('/signup');
+  const goToSignup = useCallback(() => {
+    navigate("/signup");
   }, [navigate]); // Add your dependencies here
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -105,15 +108,15 @@ const goToSignup = useCallback(() => {
         initial="initial"
         animate="animate"
         variants={fadeIn}
-        style={{ marginTop: '2rem', position: 'relative' }}
+        style={{ marginTop: "2rem", position: "relative" }}
       >
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
 
-            width: '100%',
+            width: "100%",
 
-            height: '100%',
+            height: "100%",
 
             zIndex: -1,
           }}
@@ -135,9 +138,9 @@ const goToSignup = useCallback(() => {
           style={{
             backgroundColor: theme.palette.background.paper,
 
-            padding: '2rem',
+            padding: "2rem",
 
-            borderRadius: '10px',
+            borderRadius: "10px",
           }}
         >
           <Grid container spacing={2}>
@@ -180,7 +183,7 @@ const goToSignup = useCallback(() => {
 
                 <OutlinedInput
                   id="passwordInput"
-                  type={isPasswordVisible ? 'text' : 'password'}
+                  type={isPasswordVisible ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   startAdornment={
@@ -221,12 +224,12 @@ const goToSignup = useCallback(() => {
             </Grid>
           </Grid>
         </motion.form>
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
+        <Box sx={{ mt: 2, textAlign: "center" }}>
           <Typography variant="body2" color="textSecondary">
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?{" "}
             <AnimatedButton
               onClick={goToSignup}
-              style={{ textTransform: 'none', fontWeight: 'bold' }}
+              style={{ textTransform: "none", fontWeight: "bold" }}
             >
               Sign up
             </AnimatedButton>

@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 
 import { User } from '../interface/user';
-
+import { useCallback } from 'react';
 interface RegisterResponse {
   message: string;
 }
@@ -58,23 +58,24 @@ const useAuth = () => {
     }
   };
 
-  const getUser = async (token: string) => {
-    try {
-      const response: AxiosResponse<GetUserResponse> = await axios.get(
-        '/api/auth/me',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  const getUser = useCallback(async (token: string) => {
+  try {
+    const response: AxiosResponse<GetUserResponse> = await axios.get(
+      '/api/auth/me',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      return response.data;
-    } catch (error) {
-      console.error('Error getting user information:', error);
-      throw error;
-    }
-  };
+    return response.data;
+  } catch (error) {
+    console.error('Error getting user information:', error);
+    throw error;
+  }
+}, []);
+
 
   return {
     registerUser,

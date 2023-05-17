@@ -50,7 +50,7 @@ const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({ style }) => {
       },
       particles: {
         color: {
-          value: "#ff9800", // Fire-like color
+          value: "#ff5500", // Single fire-like color
         },
         links: {
           enable: false,
@@ -59,13 +59,13 @@ const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({ style }) => {
           enable: true,
         },
         move: {
-          direction: "none" as const, // Fire-like movement direction
+          direction: "top" as const, // Fire-like movement direction
           enable: true,
           outModes: {
             default: "destroy" as const,
           },
           random: true,
-          speed: 1.5, // Adjust speed for fire-like movement
+          speed: 5, // Increase speed for more energetic movement
           straight: false,
         },
         number: {
@@ -73,31 +73,47 @@ const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({ style }) => {
             enable: true,
             area: 800,
           },
-          value: 50, // Increase the particles number for a denser fire
+          value: 100, // Increase the particles number for a denser fire
         },
         opacity: {
-          value: 0.5,
+          value: 1,
+          random: true,
+          animation: {
+            enable: true,
+            speed: 2,
+            minimumValue: 0.3, // This will make the opacity dynamic, mimicking the flickering of fire
+            sync: false,
+          }
         },
         shape: {
           type: "circle",
         },
         size: {
-          value: 3, // Adjust size for fire-like appearance
+          value: 4, // Adjust size for fire-like appearance
           random: {
             enable: true,
             minimumValue: 1,
           },
           animation: {
             enable: true,
-            speed: 3, // Animate particles size for dynamic fire-like effect
+            speed: 5, // Animate particles size for dynamic fire-like effect
             minimumValue: 0.1,
             sync: false,
           },
         },
+        twinkle: {
+          particles: {
+            enable: true,
+            frequency: 0.05,
+            opacity: 1
+          }
+        }
       },
       detectRetina: true,
     };
   }, []);
+
+
 
   return (
     <Particles

@@ -24,24 +24,26 @@ const Logo: React.FC = () => {
   return (
     <Box display="flex" justifyContent="center" mb={4}>
       <motion.img
-        src={logo}
-        alt="My App Logo"
-        width="300"
-        height="300"
-        style={{
-          borderRadius: '50%',
-          border: '2px solid',
-        }}
-        initial="initial"
-        animate="loop"
-        variants={borderAnimation}
-        transition={{
-          duration: 2,
-          ease: 'easeInOut',
-          repeat: Infinity,
-          repeatType: 'reverse',
-        }}
-      />
+  src={logo}
+  alt="My App Logo"
+  width="300"
+  height="300"
+  style={{
+    borderRadius: '50%',
+    border: '2px solid',
+    userSelect: 'none', // Add this line
+  }}
+  initial="initial"
+  animate="loop"
+  variants={borderAnimation}
+  transition={{
+    duration: 2,
+    ease: 'easeInOut',
+    repeat: Infinity,
+    repeatType: 'reverse',
+  }}
+/>
+
     </Box>
   );
 };
