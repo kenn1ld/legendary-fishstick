@@ -11,7 +11,7 @@ export const useFootballData = () => {
   const [leagues, setLeagues] = useState<League[]>([]);
   const [topScorers, setTopScorers] = useState([]);
   const [error, setError] = useState('');
-
+const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchLeagues = async () => {
       const leaguesData = await getLeagues();
@@ -29,23 +29,28 @@ export const useFootballData = () => {
     fetchLeagues();
   }, []);
 
-  const fetchTopScorers = async (selectedSeason: string, selectedLeague: string) => {
-    if (selectedLeague && selectedSeason) {
-      try {
-        const scorersData = await getTopScorers(parseInt(selectedSeason), parseInt(selectedLeague));
+    const fetchTopScorers = async (selectedSeason: string, selectedLeague: string) => {
+  setLoading(true);
+  if (selectedLeague && selectedSeason) {
+    try {
+      const scorersData = await getTopScorers(parseInt(selectedSeason), parseInt(selectedLeague));
 
-        if (scorersData && scorersData.response) {
-          setTopScorers(scorersData.response);
-          setError('');
-        }
-      } catch (err) {
-        console.error('Error fetching top scorers:', err);
-        setError('An error occurred while fetching Top Scorers.');
+      if (scorersData && scorersData.response) {
+        setTopScorers(scorersData.response);
+        setError('');
       }
-    } else {
-      console.log('League or season not selected.');
+    } catch (err) {
+      console.error('Error fetching top scorers:', err);
+      setError('An error occurred while fetching Top Scorers.');
+    } finally {
+      setLoading(false); // Add this line to ensure loading state is set to false after fetching
     }
-  };
+  } else {
+    console.log('League or season not selected.');
+    setLoading(false); // Add this line to ensure loading state is set to false even if not all data is selected
+  }
+};
 
-  return { leagues, topScorers, error, fetchTopScorers };
+
+  return { leagues, topScorers, error, fetchTopScorers, loading };
 };
