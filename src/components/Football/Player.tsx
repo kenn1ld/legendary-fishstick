@@ -1,8 +1,11 @@
 export interface Player {
   player: {
     id: number;
+    firstname: string;
+    lastname: string;
     name: string;
     position: string;
+    age: number;
     birth: {
       date: string;
       place: string;
