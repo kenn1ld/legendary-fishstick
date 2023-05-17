@@ -1,17 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+// FootballComponent.tsx
+import React from 'react';
+import { SelectChangeEvent, Button, Typography, Box, Paper } from '@mui/material';
 
-import { SelectChangeEvent, Button, Typography } from '@mui/material';
-
-import { getLeagues, getTopScorers } from './FootballApi';
 import LeagueSelect from './LeagueSelect';
 import PlayerList from './PlayerList';
 import SeasonSelect from './SeasonSelect';
 
-import { Player } from './Player';
-interface League {
-  id: number;
-  name: string;
-}
+import { useFootballData } from '../../hooks/useFootballData';
+import { useSelectedData } from '../../hooks/useSelectedData';
 
 const availableSeasonYears = [
   '2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007',
@@ -20,76 +16,58 @@ const availableSeasonYears = [
 ];
 
 const FootballComponent: React.FC = () => {
-  const [leagues, setLeagues] = useState<League[]>([]);
-  const [selectedLeague, setSelectedLeague] = useState<string>('');
-  const [selectedSeason, setSelectedSeason] = useState<string>('');
-  const [topScorers, setTopScorers] = useState<Player[]>([]);
-  const [error, setError] = useState<string>('');
+  const { leagues, topScorers, error, fetchTopScorers } = useFootballData();
+  const { selectedLeague, selectedSeason, handleLeagueChange, handleSeasonChange } = useSelectedData();
 
-  useEffect(() => {
-    const fetchLeagues = async () => {
-      const leaguesData = await getLeagues();
-      if (leaguesData && leaguesData.api) {
-        const extractedLeagues = leaguesData.api.response.map((leagueObj: { league: League }) => leagueObj.league);
-        setLeagues(extractedLeagues);
-      } else {
-        setLeagues([
-          { id: 1, name: 'Test League 1' },
-          { id: 2, name: 'Test League 2' },
-        ]);
-      }
-    };
-
-    fetchLeagues();
-  }, []);
-
-  const handleLeagueChange = useCallback((event: SelectChangeEvent<string>) => {
-    setSelectedLeague(event.target.value);
-  }, []);
-
-  const handleSeasonChange = useCallback((event: SelectChangeEvent<string>) => {
-    setSelectedSeason(event.target.value);
-  }, []);
-
-  const handleClick = useCallback(async () => {
-    console.log('Button clicked');
-    console.log('Selected league:', selectedLeague, 'Selected season:', selectedSeason);
-
+  const handleClick = async () => {
     if (selectedLeague && selectedSeason) {
-      try {
-        const scorersData = await getTopScorers(parseInt(selectedSeason), parseInt(selectedLeague));
-        console.log('Scorers data:', scorersData);
-
-        if (scorersData && scorersData.response) {
-          setTopScorers(scorersData.response);
-          setError('');
-        }
-      } catch (err) {
-        console.error('Error fetching top scorers:', err);
-        setError('An error occurred while fetching Top Scorers.');
-      }
-    } else {
-      console.log('League or season not selected.');
+      await fetchTopScorers(selectedSeason, selectedLeague);
     }
-  }, [selectedLeague, selectedSeason]);
-
-  
+  };
 
   return (
-    <div>
-      <LeagueSelect leagues={leagues} selectedLeague={selectedLeague} onChange={handleLeagueChange} />
-
-      <SeasonSelect availableSeasonYears={availableSeasonYears} selectedSeason={selectedSeason} onChange={handleSeasonChange} />
-
-      <Button variant="contained" onClick={handleClick}>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 3,
+      mt: 3,
+      p: 3,
+      bgcolor: 'background.paper',
+      borderRadius: 2,
+    }}>
+      <Paper elevation={3} sx={{ p: 2, width: '100%', maxWidth: 500 }}>
+        <LeagueSelect leagues={leagues} selectedLeague={selectedLeague} onChange={handleLeagueChange} />
+        <SeasonSelect availableSeasonYears={availableSeasonYears} selectedSeason={selectedSeason} onChange={handleSeasonChange} />
+      </Paper>
+      <Button 
+        variant="contained" 
+        onClick={handleClick}
+        sx={{
+          backgroundColor: 'secondary.main',
+          '&:hover': {
+            backgroundColor: 'secondary.dark',
+          }
+        }}>
         Get Top Scorers
       </Button>
-
-      <Typography variant="h4" component="h3" gutterBottom>
+      <Typography 
+        variant="h4" 
+        component="h3" 
+        gutterBottom
+        sx={{
+          color: 'primary.main',
+          mt: 3,
+          mb: 2,
+          textAlign: 'center',
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          fontWeight: 'bold',
+        }}>
         {error || 'Top Scorers:'}
       </Typography>
       <PlayerList players={topScorers} />
-    </div>
+    </Box>
   );
 };
 
