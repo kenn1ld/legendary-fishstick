@@ -50,7 +50,7 @@ const createDataLoader =
       const params = Object.fromEntries(
         keyParts.map((part, i) => [part, args[i]])
       );
-      const response = await apiClient.get(`/${endpoint}`, { params });
+      const response = await apiClient.get(`/v3/${endpoint}`, { params });
 
       const data = extractData(response.data);
       await saveData(indexedDBKey, data);
