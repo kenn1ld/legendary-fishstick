@@ -1,5 +1,6 @@
-import React, { useState, FormEvent } from 'react';
-
+import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import LockIcon from '@mui/icons-material/Lock';
 import MailIcon from '@mui/icons-material/Mail';
 import PersonIcon from '@mui/icons-material/Person';
@@ -19,10 +20,11 @@ import {
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-import AnimatedButton from '../components/AnimatedButton';
-import BackgroundParticles from '../components/BackgroundParticles';
-import Logo from '../components/Logo';
-import useAuth from '../hooks/useAuth';
+import AnimatedButton from '../../components/AnimatedButton';
+import BackgroundParticles from '../../components/BackgroundParticles';
+import Logo from '../../components/Logo';
+import useAuth from '../../hooks/useAuth';
+
 const fadeIn = {
   initial: { opacity: 0 },
   animate: {
@@ -43,37 +45,66 @@ const scaleUp = {
   },
 };
 
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required('Name is required'),
+  username: Yup.string()
+    .min(3, 'Username must be at least 3 characters')
+    .required('Username is required'),
+  email: Yup.string().email('Invalid email address').required('Email is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password'), ''], 'Passwords must match')
+    .required('Confirm Password is required'),
+});
+
 
 const SignupPage = () => {
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
   const { registerUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        if (values.password !== values.confirmPassword) {
+          setError('Passwords do not match');
+          return;
+        }
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+        await registerUser(
+          {
+            name: values.name,
+            email: values.email,
+            username: values.username,
+          },
+          values.password
+        );
 
-    try {
-      await registerUser({ name, email, username }, password);
-      setError('');
-      alert('User registered successfully');
+        setError('');
+        alert('User registered successfully');
 
-      // Redirect to login page after successful registration
-      navigate('/login');
-    } catch (err) {
-      setError('Error registering user');
-    }
-  };
+        // Redirect to login page after successful registration
+        navigate('/login');
+      } catch (err: any) {
+  if (err && err.response && err.response.data && err.response.data.message) {
+    setError(err.response.data.message);
+  } else {
+    setError('Error registering user');
+  }
+}
+    },
+  });
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const handleClickShowPassword = () => {
@@ -86,21 +117,12 @@ const SignupPage = () => {
   };
 
   return (
-    
     <Container maxWidth="sm">
-      
-      <motion.div
-        initial="initial"
-        animate="animate"
-        variants={fadeIn}
-        style={{ marginTop: '2rem' }}
-      >
+      <motion.div initial="initial" animate="animate" variants={fadeIn} style={{ marginTop: '2rem' }}>
         <Logo />
-
         <Typography variant="h4" gutterBottom color="textPrimary">
           Signup
         </Typography>
-
         <div
           style={{
             position: 'absolute',
@@ -111,9 +133,8 @@ const SignupPage = () => {
         >
           <BackgroundParticles />
         </div>
-
         <motion.form
-          onSubmit={handleSubmit}
+          onSubmit={formik.handleSubmit}
           initial="initial"
           animate="animate"
           variants={scaleUp}
@@ -130,8 +151,7 @@ const SignupPage = () => {
                 <OutlinedInput
                   id="nameInput"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  {...formik.getFieldProps('name')}
                   startAdornment={
                     <InputAdornment position="start">
                       <PersonIcon color="action" />
@@ -141,6 +161,9 @@ const SignupPage = () => {
                   required
                 />
               </FormControl>
+              {formik.touched.name && formik.errors.name && (
+                <Typography color="error">{formik.errors.name}</Typography>
+              )}
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined">
@@ -148,8 +171,7 @@ const SignupPage = () => {
                 <OutlinedInput
                   id="usernameInput"
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  {...formik.getFieldProps('username')}
                   startAdornment={
                     <InputAdornment position="start">
                       <PersonIcon color="action" />
@@ -159,6 +181,9 @@ const SignupPage = () => {
                   required
                 />
               </FormControl>
+              {formik.touched.username && formik.errors.username && (
+                <Typography color="error">{formik.errors.username}</Typography>
+              )}
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined">
@@ -166,8 +191,7 @@ const SignupPage = () => {
                 <OutlinedInput
                   id="emailInputSignUp"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...formik.getFieldProps('email')}
                   startAdornment={
                     <InputAdornment position="start">
                       <MailIcon color="action" />
@@ -177,6 +201,9 @@ const SignupPage = () => {
                   required
                 />
               </FormControl>
+              {formik.touched.email && formik.errors.email && (
+                <Typography color="error">{formik.errors.email}</Typography>
+              )}
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined">
@@ -184,8 +211,7 @@ const SignupPage = () => {
                 <OutlinedInput
                   id="passwordInputSignUp"
                   type={isPasswordVisible ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...formik.getFieldProps('password')}
                   startAdornment={
                     <InputAdornment position="start">
                       <LockIcon color="action" />
@@ -193,22 +219,18 @@ const SignupPage = () => {
                   }
                   endAdornment={
                     <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        onClick={handleClickShowPassword}
-                      >
-                        {isPasswordVisible ? (
-                          <Visibility color="action" />
-                        ) : (
-                          <VisibilityOff color="action" />
-                        )}
+                      <IconButton edge="end" onClick={handleClickShowPassword}>
+                        {isPasswordVisible ? <Visibility color="action" /> : <VisibilityOff color="action" />}
                       </IconButton>
                     </InputAdornment>
                   }
                   label="Password"
                   required
                 />
-              </FormControl>              
+              </FormControl>
+              {formik.touched.password && formik.errors.password && (
+                <Typography color="error">{formik.errors.password}</Typography>
+              )}
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth variant="outlined">
@@ -216,8 +238,7 @@ const SignupPage = () => {
                 <OutlinedInput
                   id="confirmPasswordInput"
                   type={isConfirmPasswordVisible ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  {...formik.getFieldProps('confirmPassword')}
                   startAdornment={
                     <InputAdornment position="start">
                       <LockIcon color="action" />
@@ -225,15 +246,8 @@ const SignupPage = () => {
                   }
                   endAdornment={
                     <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        onClick={handleClickShowConfirmPassword}
-                      >
-                        {isConfirmPasswordVisible ? (
-                          <Visibility color="action" />
-                        ) : (
-                          <VisibilityOff color="action" />
-                        )}
+                      <IconButton edge="end" onClick={handleClickShowConfirmPassword}>
+                        {isConfirmPasswordVisible ? <Visibility color="action" /> : <VisibilityOff color="action" />}
                       </IconButton>
                     </InputAdornment>
                   }
@@ -241,6 +255,9 @@ const SignupPage = () => {
                   required
                 />
               </FormControl>
+              {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                <Typography color="error">{formik.errors.confirmPassword}</Typography>
+              )}
             </Grid>
 
             {error && (
@@ -250,7 +267,7 @@ const SignupPage = () => {
             )}
 
             <Grid item xs={12}>
-              <AnimatedButton type="submit" fullWidth >
+              <AnimatedButton type="submit" fullWidth>
                 Signup
               </AnimatedButton>
             </Grid>

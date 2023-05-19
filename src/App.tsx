@@ -4,13 +4,13 @@ import {ThemeProvider, CssBaseline } from '@mui/material';
 import Football from './components/Football/Football';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
-import ApiPage from './apipage/apiPage';
+import ApiPage from './pages/Crypto/cryptoPage';
 import GlobalHeader from './header/globalheader';
 import Home from './home/home';
 import useAuth from './hooks/useAuth';
 import { User } from './interface/user';
 import LoginPage from './pages/login/login';
-import SignupPage from './signup/signup';
+import SignupPage from './pages/signup/signup';
 import theme from './theme';
 import FootballData from './components/Football/FootballData';
 
