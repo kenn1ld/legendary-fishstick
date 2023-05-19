@@ -3,7 +3,6 @@ import axios from "axios";
 import {
   Grid,
   Card,
-  CardContent,
   Typography,
   Avatar,
   CircularProgress,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ReactNode} from "react";
 
 import CodeIcon from "@mui/icons-material/Code";
 import HomeIcon from "@mui/icons-material/Home";
@@ -49,7 +49,7 @@ interface User {
 }
 
 interface GlobalHeaderProps {
-  title: string;
+  title: ReactNode;
   user: User | null;
   onLogout?: () => void;
   onLogin?: () => void;

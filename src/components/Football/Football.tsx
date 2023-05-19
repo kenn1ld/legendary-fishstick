@@ -81,14 +81,14 @@ const FootballComponent: React.FC = () => {
     handleSeasonChange,
   } = useSelectedData();
 
-  const [fetchTimeout, setFetchTimeout] = useState(false); // State for fetch timeout
+  const [fetchTimeout, setFetchTimeout] = useState(false); 
 
   const handleClick = async () => {
     if (selectedLeague && selectedSeason) {
       setFetchTimeout(false);
-      const timeoutId = setTimeout(() => setFetchTimeout(true), 10000); // Set timeout for 10 seconds
+      const timeoutId = setTimeout(() => setFetchTimeout(true), 10000); 
       await fetchTopScorers(selectedSeason, selectedLeague);
-      clearTimeout(timeoutId); // Clear the timeout if fetching is done before 10 seconds
+      clearTimeout(timeoutId); 
     }
   };
 

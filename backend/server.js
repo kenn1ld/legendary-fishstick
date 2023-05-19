@@ -1,12 +1,12 @@
 import express, { json } from "express";
-
-import { connect } from "mongoose";
+import mongoose, { connect } from "mongoose";
 import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
 
 import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
+import Visitor from "./models/visitor.js";
 
 dotenv.config();
 
@@ -33,6 +33,25 @@ app.use(cors());
 // Use the userRoutes and authRoutes middleware
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+
+// New route for visitors
+app.get("/api/visitors", async (req, res) => {
+  const ip = req.ip;
+
+  // Check if the IP already exists in the database
+  let visitor = await Visitor.findOne({ ip });
+
+  if (!visitor) {
+    // If it doesn't exist, create a new one
+    visitor = new Visitor({ ip });
+    await visitor.save();
+  }
+
+  // Count all unique visitors
+  const count = await Visitor.countDocuments();
+
+  res.json({ count });
+});
 
 // Add the following route for the VirusTotal API
 app.get("/api/virustotal/:domain", async (req, res) => {
