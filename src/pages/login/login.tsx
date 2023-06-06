@@ -94,7 +94,7 @@ const LoginPage = ({ setUser }: LoginPageProps) => {
 
   const goToSignup = useCallback(() => {
     navigate("/signup");
-  }, [navigate]); // Add your dependencies here
+  }, [navigate]); 
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 

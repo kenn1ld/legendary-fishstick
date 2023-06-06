@@ -18,7 +18,25 @@ app.use(json());
 app.use(cors());
 
 // Connect to MongoDB
-(async () => {
+connectToMongoDB();
+
+// Use the userRoutes and authRoutes middleware
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+
+// New route for visitors
+app.get("/api/visitors", handleVisitors);
+
+// Add the following route for the VirusTotal API
+app.get("/api/virustotal/:domain", handleVirusTotal);
+
+// Error handling
+app.use(errorHandler);
+
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+
+// Functions to keep the code DRY, KISS, and SOLID
+async function connectToMongoDB() {
   try {
     await connect(MONGO_URI, {
       useNewUrlParser: true,
@@ -28,14 +46,9 @@ app.use(cors());
   } catch (err) {
     console.error("Error connecting to MongoDB:", err);
   }
-})();
+}
 
-// Use the userRoutes and authRoutes middleware
-app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
-
-// New route for visitors
-app.get("/api/visitors", async (req, res) => {
+async function handleVisitors(req, res) {
   const ip = req.ip;
 
   // Check if the IP already exists in the database
@@ -51,10 +64,9 @@ app.get("/api/visitors", async (req, res) => {
   const count = await Visitor.countDocuments();
 
   res.json({ count });
-});
+}
 
-// Add the following route for the VirusTotal API
-app.get("/api/virustotal/:domain", async (req, res) => {
+async function handleVirusTotal(req, res) {
   const domain = req.params.domain;
   const url = `https://www.virustotal.com/api/v3/domains/${domain}`;
 
@@ -66,14 +78,9 @@ app.get("/api/virustotal/:domain", async (req, res) => {
   } catch (error) {
     errorHandler(error, res);
   }
-});
+}
 
-// Error handling
 function errorHandler(err, req, res, next) {
   console.error(err.stack);
   res.status(500).send("Something broke!");
 }
-
-app.use(errorHandler);
-
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

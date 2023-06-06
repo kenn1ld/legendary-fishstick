@@ -47,9 +47,6 @@ const useAuth = () => {
   }
 };
 
-
-
-
   // Login user
 
   const loginUser = async (email: string, password: string) => {

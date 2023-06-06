@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 const router = express.Router();
 const baseRoute = "/users";
 
+// User schema definition
 const userSchema = new Schema({
   name: String,
   email: {
@@ -37,59 +38,69 @@ const userSchema = new Schema({
 
 const User = model("User", userSchema);
 
+// Async handler to catch errors
 const asyncHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
+// Helper function to send response with status and data
+const sendResponse = (res, status, data) => {
+  res.status(status).send(data);
+};
+
+// GET all users
 router.get(
   baseRoute,
   asyncHandler(async (req, res) => {
     const users = await User.find();
-    res.status(StatusCodes.OK).send(users);
+    sendResponse(res, StatusCodes.OK, users);
   })
 );
 
+// GET user by ID
 router.get(
   `${baseRoute}/:id`,
   asyncHandler(async ({ params }, res) => {
     const { id } = params;
     const user = await User.findById(id);
-    if (user) {
-      res.status(StatusCodes.OK).send(user);
-    } else {
-      res.status(StatusCodes.NOT_FOUND).send({ message: "User not found" });
-    }
+    user
+      ? sendResponse(res, StatusCodes.OK, user)
+      : sendResponse(res, StatusCodes.NOT_FOUND, { message: "User not found" });
   })
 );
 
+// GET users by name
 router.get(
   `${baseRoute}/search/:name`,
   asyncHandler(async ({ params }, res) => {
     const { name } = params;
     const users = await User.find({ name: new RegExp(name, "i") });
-    res.status(StatusCodes.OK).send(users);
+    sendResponse(res, StatusCodes.OK, users);
   })
 );
 
+// GET users with pagination
 router.get(
   `${baseRoute}/page/:pageNumber/limit/:limit`,
   asyncHandler(async ({ params }, res) => {
     const { pageNumber, limit } = params;
     const skip = (pageNumber - 1) * limit;
     const users = await User.find().skip(skip).limit(limit);
-    res.status(StatusCodes.OK).send(users);
+    sendResponse(res, StatusCodes.OK, users);
   })
 );
 
+// POST new user
 router.post(
   baseRoute,
   asyncHandler(async (req, res) => {
     const user = new User(req.body);
     const savedUser = await user.save();
-    res.status(StatusCodes.CREATED).send(savedUser);
+    sendResponse(res, StatusCodes.CREATED, savedUser);
   })
 );
 
+// PUT update user role
 router.put(
   `${baseRoute}/:id`,
   asyncHandler(async ({ params, body }, res) => {
@@ -103,31 +114,31 @@ router.put(
         { new: true }
       );
 
-      if (updatedUser) {
-        res.status(StatusCodes.OK).send(updatedUser);
-      } else {
-        res.status(StatusCodes.NOT_FOUND).send({ message: "User not found" });
-      }
+      updatedUser
+        ? sendResponse(res, StatusCodes.OK, updatedUser)
+        : sendResponse(res, StatusCodes.NOT_FOUND, {
+            message: "User not found",
+          });
     } catch (error) {
-      res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: "Failed to update user role" });
+      sendResponse(res, StatusCodes.INTERNAL_SERVER_ERROR, {
+        message: "Failed to update user role",
+      });
     }
   })
 );
 
+// DELETE user
 router.delete(
   `${baseRoute}/:id`,
   asyncHandler(async ({ params }, res) => {
     const { id } = params;
     const deletedUser = await User.findByIdAndDelete(id);
-    if (deletedUser) {
-      res
-        .status(StatusCodes.OK)
-        .send({ message: "User deleted", user: deletedUser });
-    } else {
-      res.status(StatusCodes.NOT_FOUND).send({ message: "User not found" });
-    }
+    deletedUser
+      ? sendResponse(res, StatusCodes.OK, {
+          message: "User deleted",
+          user: deletedUser,
+        })
+      : sendResponse(res, StatusCodes.NOT_FOUND, { message: "User not found" });
   })
 );
 

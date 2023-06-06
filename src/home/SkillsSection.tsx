@@ -10,6 +10,12 @@ const skills = [
   'MongoDB',
   'Firebase',
   'Express',
+  'JavaScript',
+  'TypeScript',
+  'HTML',
+  'CSS',
+  'C++',
+  'C',
 ];
 
 export const SkillsSection = () => {

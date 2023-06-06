@@ -6,25 +6,31 @@ import dotenv from "dotenv";
 import { check, validationResult } from "express-validator";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import cors from "cors";
+import sanitize from "mongo-sanitize";
 
 dotenv.config();
 
 const router = Router();
-router.use(helmet()); // Use helmet for HTTP security headers
+router.use(helmet());
+router.use(cors());
 
 const User = model("User");
 const { verify, sign } = jwt;
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
 });
 
-router.use(limiter); // Apply to all requests
+router.use(limiter);
 
 const asyncHandler = (handler) => (req, res, next) =>
-  Promise.resolve(handler(req, res, next)).catch(next);
+  Promise.resolve(handler(req, res, next)).catch((err) => {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  });
 
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.header("Authorization");
@@ -43,34 +49,34 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
+const validateAndSanitize = (fields) => [
+  ...fields.map((field) => check(field).escape().trim()),
+];
+
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
+
 router.post(
   "/register",
-  [
-    // Validate inputs
-    check("name").isLength({ min: 1 }),
-    check("email").isEmail(),
-    check("username").isLength({ min: 3 }),
-    check("password").isLength({ min: 6 }),
-  ],
+  validateAndSanitize(["name", "email", "username", "password"]),
+  handleValidationErrors,
   asyncHandler(async (req, res) => {
-    // Check validation result
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { name, email, username, password, role } = req.body;
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await hash(password, 12);
     const newUser = new User({
-      name,
-      email,
-      username,
+      name: sanitize(name),
+      email: sanitize(email),
+      username: sanitize(username),
       password: hashedPassword,
       role,
     });
 
     const savedUser = await newUser.save();
-    // Ensure sensitive data isn't sent back to the client
     const { password: _, ...savedUserWithoutPassword } = savedUser.toObject();
     res.status(201).send(savedUserWithoutPassword);
   })
@@ -78,20 +84,11 @@ router.post(
 
 router.post(
   "/login",
-  [
-    // Validate inputs
-    check("email").isEmail(),
-    check("password").isLength({ min: 6 }),
-  ],
+  validateAndSanitize(["email", "password"]),
+  handleValidationErrors,
   asyncHandler(async (req, res) => {
-    // Check validation result
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: sanitize(email) });
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }

@@ -13,6 +13,9 @@ import Football from "./components/Football/Football";
 import FootballData from "./components/Football/FootballData";
 import theme from "./theme";
 import CountUp from "react-countup";
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
 interface HeaderTitleProps {
   visitorCount: number;
@@ -71,15 +74,15 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({ visitorCount }) => (
     <Typography variant="h5" component="span" color="primary">
       Kenneth&apos;s Portfolio
     </Typography>
-    <Box ml={2} display="flex" alignItems="center">
-      <Typography variant="subtitle2" component="span">
-        Visitors:
+    <Box ml={3} display="flex" alignItems="center">
+      <Tooltip title="Visitor Count" arrow>
+        <IconButton color="primary">
+          <PeopleAltIcon />
+        </IconButton>
+      </Tooltip>
+      <Typography variant="h6" component="span">
+        <CountUp end={visitorCount} duration={2.75} />
       </Typography>
-      <Box ml={1}>
-        <Typography variant="h4" component="span">
-          <CountUp end={visitorCount} duration={2.75} />
-        </Typography>
-      </Box>
     </Box>
   </Box>
 );

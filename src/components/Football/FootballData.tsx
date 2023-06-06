@@ -1,5 +1,3 @@
-
-
 const FootballData = () => {
   //null
   return (
