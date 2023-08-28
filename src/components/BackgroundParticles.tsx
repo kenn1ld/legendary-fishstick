@@ -1,7 +1,7 @@
-import React, { CSSProperties, useCallback, useMemo } from "react";
-import { Particles } from "react-tsparticles";
-import { loadFull } from "tsparticles";
-import { Main } from "tsparticles-engine";
+import React, { CSSProperties, useCallback, useMemo } from 'react';
+import { Particles } from 'react-tsparticles';
+import { loadFull } from 'tsparticles';
+import { Main } from 'tsparticles-engine';
 
 interface BackgroundParticlesProps {
   style?: CSSProperties;
@@ -12,23 +12,20 @@ const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({ style }) => {
     await loadFull(engine);
   }, []);
 
-  const combinedStyle = useMemo(
-    () => ({
-      position: "relative" as const,
-      zIndex: -1,
-      height: "100%",
-      width: "100%",
-      ...style,
-    }),
-    [style]
-  );
+  const combinedStyle = useMemo(() => ({
+    position: 'relative' as const,
+    zIndex: -1,
+    height: '100%',
+    width: '100%',
+    ...style,
+  }), [style]);
 
   const particleOptions = useMemo(() => ({
-    fpsLimit: 120,
+    fpsLimit: 60,  // Reduced FPS for better performance
     interactivity: {
       events: {
-        onClick: { enable: true, mode: "push" },
-        onHover: { enable: true, mode: "repulse" },
+        onClick: { enable: true, mode: 'push' },
+        onHover: { enable: true, mode: 'repulse' },
         resize: true,
       },
       modes: {
@@ -37,34 +34,34 @@ const BackgroundParticles: React.FC<BackgroundParticlesProps> = ({ style }) => {
       },
     },
     particles: {
-      color: { value: "#ff5500" },
+      color: { value: '#ff5500' },
       links: { enable: false },
       collisions: { enable: true },
       move: {
-        direction: "top" as const,
+        direction: 'top' as const,
         enable: true,
-        outModes: { default: "destroy" as const },
+        outModes: { default: 'destroy' as const },
         random: true,
         speed: 5,
         straight: false,
       },
       number: {
-        density: { enable: true, area: 800 },
-        value: 100,
+        density: { enable: true, area: 400 },  // Reduced area for better performance
+        value: 50,  // Reduced particle count for better performance
       },
       opacity: {
         value: 1,
         random: true,
-        animation: { enable: true, speed: 2, minimumValue: 0.3, sync: false },
+        animation: { enable: false },  // Disabled animation for better performance
       },
-      shape: { type: "circle" },
+      shape: { type: 'circle' },
       size: {
         value: 4,
         random: { enable: true, minimumValue: 1 },
-        animation: { enable: true, speed: 5, minimumValue: 0.1, sync: false },
+        animation: { enable: false },  // Disabled animation for better performance
       },
       twinkle: {
-        particles: { enable: true, frequency: 0.05, opacity: 1 },
+        particles: { enable: false },  // Disabled twinkle for better performance
       },
     },
     detectRetina: true,

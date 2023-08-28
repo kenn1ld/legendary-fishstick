@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "http://backend:5000",
+  "__comment": "Use http://localhost:5000 if using locally",
+  "_comment": "Use http://backend:5000 if using docker",
   "dependencies": {
     "@emotion/react": "^11.10.8",
     "@emotion/styled": "^11.10.8",
@@ -53,7 +55,7 @@
     "yup": "^1.1.1"
   },
   "scripts": {
-    "start-react": "react-scripts start",
+    "start-react": "WATCHPACK_POLLING=true react-scripts start",
     "start-webpack": "webpack --watch",
     "start": "concurrently \"npm run start-react\" \"npm run start-webpack\"",
     "test": "react-scripts test",
