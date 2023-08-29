@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useReducer, useCallback } from 'react';
 import axios from 'axios';
 import { Grid, Card, Typography, Avatar, CircularProgress, Fade } from '@mui/material';
 import { saveData, loadData } from '../../config/indexedDBConfig';
 import { styled } from '@mui/system';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Interfaces and Initial States
 interface CryptoData {
@@ -49,6 +50,55 @@ const LoadingContainer = styled('div')`
   height: 80vh;
 `;
 
+// Additional styling
+const MoreInfo = styled(motion.div)`
+  margin-top: 32px;
+  padding: 16px;
+  border-radius: 8px;
+  
+  font-family: 'Arial', sans-serif;
+`;
+
+const InfoHeader = styled(motion.h2)`
+  font-size: 28px;
+  margin-bottom: 16px;
+  text-align: center;
+  color: #ffff;
+  font-weight: bold;
+`;
+
+const InfoItem = styled(motion.div)`
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #ffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+// Animation variants for framer-motion
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.3
+    }
+  }
+};
+
+const childVariants = {
+  hidden: { x: '-100%', opacity: 0 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 120
+    }
+  }
+};
+
 const ErrorText = styled(Typography)`
   color: red;
   text-align: center;
@@ -68,27 +118,47 @@ const CryptoCard = styled(Card)`
   padding: 16px;
 `;
 
+type Actions = 
+  | { type: 'START_LOADING' }
+  | { type: 'LOAD_SUCCESS', payload: SavedData }
+  | { type: 'LOAD_FAIL', payload: string };
+
+// Reducer function to manage state
+const reducer = (state: State, action: Actions): State => {
+  switch (action.type) {
+    case 'START_LOADING':
+      return { ...initialState, loading: true };
+    case 'LOAD_SUCCESS':
+      return { ...initialState, cryptos: action.payload.data, lastUpdated: action.payload.lastUpdated };
+    case 'LOAD_FAIL':
+      return { ...initialState, error: action.payload };
+    default:
+      return state;
+  }
+};
+
 // Custom Hook
 const useCryptoData = () => {
-  const [state, setState] = useState<State>(initialState);
-
+  const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     const fetchData = async () => {
-      const savedData: SavedData | null = await loadData(LOCAL_STORAGE_KEY, 0.16);
-      
-      if (savedData) {
-        setState({ ...initialState, cryptos: savedData.data, lastUpdated: savedData.lastUpdated });
-      } else {
-        try {
-          setState({ ...initialState, loading: true });
+      try {
+        const savedData: SavedData | null = await loadData(LOCAL_STORAGE_KEY, 0.16);
+        
+        if (savedData) {
+          dispatch({ type: 'LOAD_SUCCESS', payload: savedData });
+        } else {
+          dispatch({ type: 'START_LOADING' });
+          
           const { data } = await axios.get<CryptoData[]>(API_URL);
           const newData: SavedData = { data, lastUpdated: new Date() };
+          
           await saveData(LOCAL_STORAGE_KEY, newData);
-          setState({ ...initialState, cryptos: newData.data, lastUpdated: newData.lastUpdated });
-        } catch (error) {
-          console.error("Failed to fetch data:", error);
-          setState({ ...initialState, error: `Failed to fetch data. Error: ${error}` });
+          dispatch({ type: 'LOAD_SUCCESS', payload: newData });
         }
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        dispatch({ type: 'LOAD_FAIL', payload: `Failed to fetch data. Error: ${error}` });
       }
     };
 
@@ -100,12 +170,17 @@ const useCryptoData = () => {
 
 const CryptoCurrency: React.FC = () => {
   const { cryptos, error, loading, lastUpdated } = useCryptoData();
+  const [selectedCrypto, setSelectedCrypto] = useState<CryptoData | null>(null);
+
+  const handleCardClick = useCallback((crypto: CryptoData) => {
+    setSelectedCrypto(crypto);
+  }, []);
 
   const filteredCryptos = useMemo(() => 
     cryptos.filter(crypto => crypto?.id && crypto?.image && crypto?.name), 
     [cryptos]
   );
-
+  
   return (
     <Container>
       {loading ? (
@@ -123,7 +198,7 @@ const CryptoCurrency: React.FC = () => {
             {filteredCryptos.map((crypto, index) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={crypto.id}>
                 <Fade in={!loading} timeout={500 + index * 300}>
-                  <CryptoCard>
+                  <CryptoCard onClick={() => handleCardClick(crypto)}>
                     <Avatar src={crypto.image} alt={crypto.name} />
                     <Typography variant="h6">{crypto.symbol.toUpperCase()}</Typography>
                     <Typography variant="body2">
@@ -137,6 +212,31 @@ const CryptoCurrency: React.FC = () => {
               </Grid>
             ))}
           </Grid>
+          <AnimatePresence mode='wait'>
+  {selectedCrypto && (
+    <MoreInfo
+      key={selectedCrypto.id} 
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      variants={containerVariants}
+    >
+      <InfoHeader variants={childVariants}>More Information</InfoHeader>
+      <InfoItem variants={childVariants}>
+        <strong>Name:</strong> <span>{selectedCrypto.name}</span>
+      </InfoItem>
+      <InfoItem variants={childVariants}>
+        <strong>Symbol:</strong> <span>{selectedCrypto.symbol.toUpperCase()}</span>
+      </InfoItem>
+      <InfoItem variants={childVariants}>
+        <strong>Current Price:</strong> <span>${selectedCrypto.current_price.toFixed(2)}</span>
+      </InfoItem>
+      <InfoItem variants={childVariants}>
+        <strong>Price Change (24h):</strong> <span>{selectedCrypto.price_change_percentage_24h.toFixed(2)}%</span>
+      </InfoItem>
+    </MoreInfo>
+  )}
+</AnimatePresence>
         </>
       )}
     </Container>
